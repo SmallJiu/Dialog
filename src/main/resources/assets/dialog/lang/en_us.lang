@@ -1,0 +1,44 @@
+dialog.text.loading=Loading...
+dialog.text.minutes=m
+dialog.text.seconds=s
+dialog.text.confirm=Done
+dialog.text.continue=Continue
+dialog.text.back=Back
+dialog.text.custom_option=Custom option. You can custom a dialog option yourself_ABCDEFG0123456789!@#$^&*()_+
+
+dialog.config.vanilla_wrap=Use vanilla to fromat Text 
+dialog.config.test_dialog=Enable Test Dialog
+dialog.config.dialog_width=Dialog Gui Width
+
+// example from Sea of Thieves
+
+dialog.dev.0.title=Our efforts will soon pay off! The charm doll safely stored in our sea fortress and delivered to this ceremony site will soon bring my father back...
+dialog.dev.0.btn.0=How was the ceremony carried out?
+dialog.dev.0.btn.1=Tell me about the disputed sea fortress.
+dialog.dev.0.btn.2=Tell me about the charm doll.
+dialog.dev.0.btn.3=Tell me about Captain Soul Fire.
+dialog.dev.0.text.4=Please let your father give glory to...
+
+dialog.dev.info=What do I need to know?
+
+dialog.dev.0.text.4.msg=My father will give glory to %s.
+
+dialog.dev.100.title=Our sea fortress is located in the magic relic, which is very suitable for an unprecedented summoning ceremony! Take Father Home...
+dialog.dev.101.title=This is why the sea fortress must be controlled by us, so that the flag of the skeleton of death can be seen by everyone!
+dialog.dev.102.title=They will collect the charm dolls from the fortress and bring them to me. They will also help my father regenerate. There is more work to be done...
+dialog.dev.103.title=The captain of the Soul Fireboat often haunts the sea fortress. If they are destroyed, their energy can cast a magic spell on the charm doll and greatly increase the doll's power
+dialog.dev.104.title=I will dedicate our flag to all those who have the courage to seize the sea fortress in our name and bring the dark relics inside to me. The flame must burn!
+
+dialog.dev.200.title=There are six flags in all. Once the uncontrolled phantoms are eliminated, our flag can be hung on the flagpole of the sea fortress as a symbol of our dominance.
+dialog.dev.201.title=We know that the intruders are trying to sabotage our glorious work. Their flags must be removed and destroyed, even if you have no substitutes!
+dialog.dev.202.title=Marine Fortress in Potential Huge places appear. The more we control, the better I can make use of your charm doll.
+dialog.dev.203.title=You must give consideration to the rule of the sea fortress and the continuous and stable provision of dolls to me. Try to exert all your strength and tricks!
+
+dialog.dev.300.title=We need these dark relics to complete the ceremony. They were stored in the treasure house of the sea fortress. The captain of the fort has a key, and the key is disposable
+dialog.dev.301.title=These simple minded souls may have abandoned other charm dolls around the sea fortress, so you must be careful when attacking.
+dialog.dev.302.title=Our enemies are also looking for Charming Dolls. If you can sink or board their ships and steal relics from their eyes, do so!
+
+dialog.dev.400.title=A savage exile from the Sea of Damn. They have their own uses, but for now, their main significance lies in the energy they contain.
+dialog.dev.401.title=If you can defeat a Soul Fire Captain, you can use the rest to cast a spell on the Charming Doll. This relic will help the ceremony!
+dialog.dev.402.title=If you are lucky enough to meet one in the fortress, you must knock it down and seize its power in the name of flame!
+dialog.dev.403.title=The crew who can command all six sea fortresses and bring me the Charm Doll in this way will surely win my father's respect.
