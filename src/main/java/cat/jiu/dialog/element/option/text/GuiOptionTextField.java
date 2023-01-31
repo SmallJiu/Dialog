@@ -9,7 +9,7 @@ import cat.jiu.dialog.ModMain;
 import cat.jiu.dialog.api.DialogDimension;
 import cat.jiu.dialog.api.OptionDimension;
 import cat.jiu.dialog.element.option.DialogOptionDrawUnit;
-import cat.jiu.dialog.event.DialogOptionEvent;
+import cat.jiu.dialog.event.OptionEvent;
 import cat.jiu.dialog.net.MsgOptionEvent;
 import cat.jiu.dialog.ui.GuiDialog;
 import net.minecraft.client.Minecraft;
@@ -56,7 +56,7 @@ public class GuiOptionTextField extends DialogOptionDrawUnit {
 					player.closeScreen();
 				}
 				
-				DialogOptionEvent.TextConfirm event = new DialogOptionEvent.TextConfirm(player, dialogID, optionID, field.getText());
+				OptionEvent.TextConfirm event = new OptionEvent.TextConfirm(player, dialogID, optionID, field.getText());
 				if(MinecraftForge.EVENT_BUS.post(event)) return;
 				field.setText(event.getText());
 				ModMain.network.sendMessageToServer(new MsgOptionEvent(dialogID, optionID, field.getText()));

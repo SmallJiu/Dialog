@@ -17,7 +17,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 /**
- * 对话框的按钮组件，点击后将在服务端与客户端触发{@link cat.jiu.dialog.event.DialogOptionEvent.ButtonClick}
+ * 对话框的按钮组件，点击后将在服务端与客户端触发{@link cat.jiu.dialog.event.OptionEvent.ButtonClick}
  * @author small_jiu
  */
 public class DialogButton implements IDialogOptionDataUnit {

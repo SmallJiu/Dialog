@@ -68,12 +68,16 @@ public abstract class DialogOptionDrawUnit {
 	
 	/**
 	 * 初始化完成后调用
+	 * @param guiDialog 
 	 * @param fr
 	 */
 	@SideOnly(Side.CLIENT)
-	public void init(FontRenderer fr) {
-		
+	public void init(GuiDialog gui, FontRenderer fr) {
+		this.init(fr);
 	}
+	@Deprecated
+	@SideOnly(Side.CLIENT)
+	public void init(FontRenderer fr) {}
 
 	/**
 	 * 绘制组件

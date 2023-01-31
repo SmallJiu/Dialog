@@ -9,9 +9,10 @@ import cat.jiu.dialog.ModMain;
 import cat.jiu.dialog.api.DialogDimension;
 import cat.jiu.dialog.api.OptionDimension;
 import cat.jiu.dialog.element.option.DialogOptionDrawUnit;
-import cat.jiu.dialog.event.DialogOptionEvent;
+import cat.jiu.dialog.event.OptionEvent;
 import cat.jiu.dialog.net.MsgOptionEvent;
 import cat.jiu.dialog.ui.GuiDialog;
+import cat.jiu.dialog.ui.GuiHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.Gui;
@@ -46,7 +47,7 @@ public class GuiOptionButton extends DialogOptionDrawUnit {
 			if(this.dataUnit.canCloseDialog()) {
 				this.player.closeScreen();
 			}
-			MinecraftForge.EVENT_BUS.post(new DialogOptionEvent.ButtonClick(this.player, this.dialogID, this.optionID, mouseButton));
+			MinecraftForge.EVENT_BUS.post(new OptionEvent.ButtonClick(this.player, this.dialogID, this.optionID, mouseButton));
 			ModMain.network.sendMessageToServer(new MsgOptionEvent(this.dialogID, this.optionID, mouseButton));
 			
 			playClickSound();
@@ -80,7 +81,7 @@ public class GuiOptionButton extends DialogOptionDrawUnit {
 	 * @param dim 组件的显示信息
 	 */
 	protected void drawBackground(GuiDialog gui, Minecraft mc, boolean hover, OptionDimension dim) {
-		mc.getTextureManager().bindTexture(GuiDialog.dialog);
+		mc.getTextureManager().bindTexture(GuiHandler.dialog_texture);
 		int width = dim.width+4;
 		if(hover) {
 			// 中间大背景

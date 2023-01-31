@@ -12,8 +12,10 @@ import cat.jiu.dialog.ModMain;
 import cat.jiu.dialog.api.DialogDimension;
 import cat.jiu.dialog.api.OptionDimension;
 import cat.jiu.dialog.element.option.DialogOptionDrawUnit;
+import cat.jiu.dialog.event.DialogEvent;
 import cat.jiu.dialog.event.DialogInputEvent;
 import cat.jiu.dialog.iface.IDialogOptionDataUnit;
+import cat.jiu.dialog.net.MsgDialogEvent;
 import cat.jiu.dialog.utils.DialogConfig;
 
 import net.minecraft.client.Minecraft;
@@ -25,6 +27,8 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.inventory.Slot;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 
 import net.minecraftforge.common.MinecraftForge;
@@ -36,17 +40,16 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 @SideOnly(Side.CLIENT)
 @EventBusSubscriber(Side.CLIENT)
 public class GuiDialog extends GuiContainer {
-	public static final ResourceLocation dialog = new ResourceLocation(ModMain.MODID, "textures/gui/dialog.png");
-	
 	protected final EntityPlayer player;
 	protected final List<Unit> options = Lists.newArrayList();
 	protected final ContainerDialog contaniner;
 	protected final DialogDimension dim = new DialogDimension(this.getTextLength()+5, 0);
 	
 	public GuiDialog(EntityPlayer player) {
-		super(new ContainerDialog());
+		super(new ContainerDialog(player));
 		this.player = player;
 		this.contaniner = (ContainerDialog) super.inventorySlots;
+		this.xSize = this.getTextLength()+5;
 		MinecraftForge.EVENT_BUS.register(this);
 	}
 	
@@ -146,70 +149,74 @@ public class GuiDialog extends GuiContainer {
 	@Override
 	public void drawScreen(int mouseX, int mouseY, float partialTicks) {
 		super.drawScreen(mouseX, mouseY, partialTicks);
+		this.renderHoveredToolTip(mouseX, mouseY);
+	}
+	
+	protected void drawDialog(int mouseX, int mouseY) {
+		GlStateManager.disableRescaleNormal();
+        RenderHelper.disableStandardItemLighting();
+        GlStateManager.disableLighting();
+        GlStateManager.disableDepth();
+        
+		ScaledResolution sr = new ScaledResolution(this.mc);
+        int x = sr.getScaledWidth() / 2 + this.getDrawX();
+        
+        int height = this.title.size() * 9 + 2 + 8;
+        for(int i = 0; i < this.options.size(); i++) {
+        	height += this.options.get(i).drawUnit.getHeight(this.fontRenderer);
+        }
+        int y = (int) sr.getScaledHeight() / 2 + 30;
+        if(y+height > sr.getScaledHeight()) {
+        	y = sr.getScaledHeight() - height;
+        }
+        
+        GlStateManager.pushAttrib();
+        GlStateManager.pushMatrix();
+        this.drawBackground(x-3 - 5 - 2, y - 3, this.getTextLength()+5, height);
+        GlStateManager.popMatrix();
+        GlStateManager.popAttrib();
 		
-		if(this.init) {
-			GlStateManager.disableRescaleNormal();
-	        RenderHelper.disableStandardItemLighting();
-	        GlStateManager.disableLighting();
-	        GlStateManager.disableDepth();
-	        
-			ScaledResolution sr = new ScaledResolution(this.mc);
-	        int x = sr.getScaledWidth() / 2 + this.getDrawX();
-	        
-	        int height = this.title.size() * 9 + 2 + 8;
-	        for(int i = 0; i < this.options.size(); i++) {
-	        	height += this.options.get(i).drawUnit.getHeight(this.fontRenderer);
-	        }
-	        int y = (int) sr.getScaledHeight() / 2 + 30;
-	        if(y+height > sr.getScaledHeight()) {
-	        	y = sr.getScaledHeight() - height;
-	        }
-	        
-	        GlStateManager.pushMatrix();
-			GlStateManager.color(1.0f, 1.0f, 1.0f, 1.0f);
-	        this.drawBackground(x-3 - 5 - 2, y - 3, this.getTextLength()+5, height);
-			GlStateManager.popMatrix();
-			
-			for(int i = 0; i < this.title.size(); i++) {
-				if(this.contaniner.getDialog().getTitle().isCenter()) {
-					this.drawCenteredString(fontRenderer, this.title.get(i), x-5 + this.getTextLength()/2, y+2, Color.BLACK.getRGB());
-				}else {
-					this.fontRenderer.drawString(this.title.get(i), x-5, y+2, Color.BLACK.getRGB());
-				}
-				y += 9;
+		for(int i = 0; i < this.title.size(); i++) {
+			if(this.contaniner.getDialog().getTitle().isCenter()) {
+				this.drawCenteredString(fontRenderer, this.title.get(i), x-5 + this.getTextLength()/2, y+2, Color.BLACK.getRGB());
+			}else {
+				this.fontRenderer.drawString(this.title.get(i), x-5, y+2, Color.BLACK.getRGB());
 			}
-			
-			y+=3;
-			for(int i = 0; i < this.options.size(); i++) {
-				Unit unit = this.options.get(i);
-				if(unit.dimension.defaultDimension) {
-					unit.dimension.x = x;
-					unit.dimension.y = y;
-				}
-				
-				unit.drawUnit.draw(this, mouseX, mouseY, unit.dimension, this.mc, this.fontRenderer);
-				if(isInRange(mouseX, mouseY, unit.dimension)) {
-			        GlStateManager.pushMatrix();
-					GlStateManager.color(1.0f, 1.0f, 1.0f, 1.0f);
-					
-					this.mc.getTextureManager().bindTexture(dialog);
-					this.drawTexturedModalRect(unit.dimension.x - 4 - 2, y + unit.drawUnit.getHeight(this.fontRenderer) / 2 - 2, 0, 0, 4, 4);
-					
-					GlStateManager.popMatrix();
-				}
-				
-				y += unit.drawUnit.getHeight(this.fontRenderer);
-			}
-			
-			for(int i = 0; i < this.options.size(); i++) {
-				this.options.get(i).drawUnit.drawHoveringText(this, this.mc, this.fontRenderer, mouseX, mouseY, sr, this.options.get(i).dimension);
-			}
-			
-			GlStateManager.enableLighting();
-	        GlStateManager.enableDepth();
-	        RenderHelper.enableStandardItemLighting();
-	        GlStateManager.enableRescaleNormal();
+			y += 9;
 		}
+		
+//		super.drawSlot(new Slot(mc.player.inventory, 0, 5, sr.getScaledHeight() - 21));
+		
+		y+=3;
+		for(int i = 0; i < this.options.size(); i++) {
+			Unit unit = this.options.get(i);
+			if(unit.dimension.defaultDimension) {
+				unit.dimension.x = x;
+				unit.dimension.y = y;
+			}
+			
+			unit.drawUnit.draw(this, mouseX, mouseY, unit.dimension, this.mc, this.fontRenderer);
+			if(isInRange(mouseX, mouseY, unit.dimension)) {
+		        GlStateManager.pushMatrix();
+				GlStateManager.color(1.0f, 1.0f, 1.0f, 1.0f);
+				
+				this.mc.getTextureManager().bindTexture(GuiHandler.dialog_texture);
+				this.drawTexturedModalRect(unit.dimension.x - 4 - 2, y + unit.drawUnit.getHeight(this.fontRenderer) / 2 - 2, 0, 0, 4, 4);
+				
+				GlStateManager.popMatrix();
+			}
+			
+			y += unit.drawUnit.getHeight(this.fontRenderer);
+		}
+		
+		for(int i = 0; i < this.options.size(); i++) {
+			this.options.get(i).drawUnit.drawHoveringText(this, this.mc, this.fontRenderer, mouseX, mouseY, sr, this.options.get(i).dimension);
+		}
+		
+		GlStateManager.enableLighting();
+        GlStateManager.enableDepth();
+        RenderHelper.enableStandardItemLighting();
+        GlStateManager.enableRescaleNormal();
 	}
 	
 	protected void drawBackground(int startX, int startY, int width, int height) {
@@ -219,7 +226,7 @@ public class GuiDialog extends GuiContainer {
     	int endX = startX + width + 12 - 3;
     	int endY = startY + height - 4;
     	
-        this.mc.getTextureManager().bindTexture(dialog);
+        this.mc.getTextureManager().bindTexture(GuiHandler.dialog_texture);
         
 //      for(int i = startX + 4; i < endX + 1; i++) {
 //			for(int j = startY + 4; j < endY + 1; j++) {
@@ -291,6 +298,10 @@ public class GuiDialog extends GuiContainer {
 	
 	@Override
 	protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) {
+		if(this.init) {
+			this.drawDialog(mouseX, mouseY);
+		}
+		
 		if(this.contaniner.getDialog()!=null && !this.init) {
 			String titleStr = this.contaniner.getDialog().getTitle().format();
 			if(this.contaniner.getDialog().getTitle().isVanillaWrap()) {
@@ -326,12 +337,15 @@ public class GuiDialog extends GuiContainer {
 	        	dialogY = sr.getScaledHeight() - height;
 	        }
 	        this.dim.height = height;
+	        this.ySize = height;
 	        
 	        for(int i = 0; i < this.options.size(); i++) {
-	        	this.options.get(i).drawUnit.init(this.fontRenderer);
+	        	this.options.get(i).drawUnit.init(this, this.fontRenderer);
 	        }
 	        
-			this.init = true;
+	        MinecraftForge.EVENT_BUS.post(new DialogEvent.Open(this.player, this.contaniner.getDialog().getID()));
+			ModMain.network.sendMessageToServer(new MsgDialogEvent(this.contaniner.getDialog().getID(), true));
+	        this.init = true;
 		}
 		
 		if(!this.init) {
@@ -395,7 +409,7 @@ public class GuiDialog extends GuiContainer {
 		
 		GlStateManager.pushMatrix();
 		GlStateManager.color(1.0f, 1.0f, 1.0f, 1.0f);
-		this.mc.getTextureManager().bindTexture(dialog);
+		this.mc.getTextureManager().bindTexture(GuiHandler.dialog_texture);
 		this.drawTexturedModalRect(x + width, y - 8, 0, 9 + (8 * this.loadingIndex), 10, 7);
 		GlStateManager.popMatrix();
 	}
@@ -404,6 +418,10 @@ public class GuiDialog extends GuiContainer {
 	public void onGuiClosed() {
 		super.onGuiClosed();
 		MinecraftForge.EVENT_BUS.unregister(this);
+		if(this.contaniner.getDialog()!=null) {
+			MinecraftForge.EVENT_BUS.post(new DialogEvent.Close(this.player, this.contaniner.getDialog().getID()));
+			ModMain.network.sendMessageToServer(new MsgDialogEvent(this.contaniner.getDialog().getID(), false));
+		}
 	}
 	
 	// public method
@@ -427,6 +445,40 @@ public class GuiDialog extends GuiContainer {
 	}
 	public void drawCenteredStringWithShadow(FontRenderer fr, String text, int x, int y, int color) {
 		fr.drawString(text, (float)(x - fr.getStringWidth(text) / 2), (float)y, color, true);
+	}
+	
+	public Slot addSlot(Slot slot) {
+		return this.contaniner.addSlotToContainer(slot);
+	}
+	
+	public Slot getSlot(int index) {
+		return this.contaniner.getSlot(index);
+	}
+	
+	@Override
+	public void drawItemStack(ItemStack stack, int x, int y, String altText) {
+		super.drawItemStack(stack, x, y, altText);
+	}
+	
+	@Override
+	public boolean isMouseOverSlot(Slot slot, int mouseX, int mouseY) {
+		return super.isMouseOverSlot(slot, mouseX, mouseY);
+	}
+	
+	@Override
+	public Slot getSlotAtPosition(int x, int y) {
+		return super.getSlotAtPosition(x, y);
+	}
+	
+	@Override
+	public void drawSlot(Slot slot) {
+		if(slot.isEnabled() && GuiHandler.dialog_texture.equals(slot.getBackgroundLocation())) {
+			GlStateManager.disableLighting();
+			this.mc.getTextureManager().bindTexture(GuiHandler.dialog_texture);
+			this.drawTexturedModalRect(slot.xPos-1, slot.yPos-1, 0,48, 18, 18);
+	        GlStateManager.enableLighting();
+		}
+		super.drawSlot(slot);
 	}
 	
 	// static
@@ -462,7 +514,7 @@ public class GuiDialog extends GuiContainer {
 		return texts;
 	}
 	
-	public static class Unit {
+	class Unit {
 		public final DialogOptionDrawUnit drawUnit;
 		public final OptionDimension dimension;
 		public Unit(DialogOptionDrawUnit option, OptionDimension dimension) {

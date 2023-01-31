@@ -1,7 +1,7 @@
 package cat.jiu.dialog.net;
 
 import cat.jiu.dialog.element.DialogOptionType;
-import cat.jiu.dialog.event.DialogOptionEvent;
+import cat.jiu.dialog.event.OptionEvent;
 import cat.jiu.dialog.iface.IDialogOptionType;
 import io.netty.buffer.ByteBuf;
 
@@ -73,15 +73,15 @@ public class MsgOptionEvent implements IMessage {
 	public final IMessage handler(MessageContext ctx) {
 		if(ctx.side.isServer()) {
 			if(DialogOptionType.BUTTON.getTypeID().equals(this.optionType)) {
-				MinecraftForge.EVENT_BUS.post(new DialogOptionEvent.ButtonClick(
+				MinecraftForge.EVENT_BUS.post(new OptionEvent.ButtonClick(
 						ctx.getServerHandler().player,
 						this.dialogID, this.optionID, this.mouseButton));
 			}else if(DialogOptionType.TEXT.getTypeID().equals(this.optionType)) {
-				MinecraftForge.EVENT_BUS.post(new DialogOptionEvent.TextConfirm(
+				MinecraftForge.EVENT_BUS.post(new OptionEvent.TextConfirm(
 						ctx.getServerHandler().player,
 						this.dialogID, this.optionID, this.text));
 			}else {
-				DialogOptionEvent event = this.customEvent(ctx);
+				OptionEvent event = this.customEvent(ctx);
 				if(event!=null) {
 					MinecraftForge.EVENT_BUS.post(event);
 				}
@@ -90,5 +90,5 @@ public class MsgOptionEvent implements IMessage {
 		return this;
 	}
 	
-	protected DialogOptionEvent customEvent(MessageContext ctx) {return null;}
+	protected OptionEvent customEvent(MessageContext ctx) {return null;}
 }

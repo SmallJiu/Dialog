@@ -17,7 +17,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 /**
- * 对话框的文本输入组件，点击后将在服务端与客户端触发{@link cat.jiu.dialog.event.DialogOptionEvent.TextConfirm}
+ * 对话框的文本输入组件，点击后将在服务端与客户端触发{@link cat.jiu.dialog.event.OptionEvent.TextConfirm}
  * @author small_jiu
  */
 public class DialogTextField implements IDialogOptionDataUnit {

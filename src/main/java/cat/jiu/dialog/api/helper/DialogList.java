@@ -6,7 +6,7 @@ import java.util.Map.Entry;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
-import cat.jiu.dialog.event.DialogOptionEvent;
+import cat.jiu.dialog.event.OptionEvent;
 import cat.jiu.dialog.iface.*;
 
 import net.minecraft.entity.player.EntityPlayer;
@@ -100,14 +100,14 @@ public class DialogList {
 	}
 	
 	@SubscribeEvent(priority = EventPriority.LOWEST)
-	public void onDialogOptionButtonClick(DialogOptionEvent.ButtonClick event) {
+	public void onDialogOptionButtonClick(OptionEvent.ButtonClick event) {
 		if(!event.isCanceled()) {
 			this.execute(event.player, event.dialogID, event.optionID, event.mouseButton);
 		}
 	}
 	
 	@SubscribeEvent(priority = EventPriority.LOWEST)
-	public void onDialogOptionEditTextConfirm(DialogOptionEvent.TextConfirm event) {
+	public void onDialogOptionEditTextConfirm(OptionEvent.TextConfirm event) {
 		if(!event.isCanceled()) {
 			this.execute(event.player, event.getText(), event.dialogID, event.optionID);
 		}

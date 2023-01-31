@@ -1,0 +1,3 @@
+1.0.0-a1：
+  1.Add open event and close event of dialog.
+  2.Lower dialog gui render order.

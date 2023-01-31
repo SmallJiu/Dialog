@@ -5,6 +5,7 @@ import com.google.gson.JsonObject;
 import cat.jiu.dialog.element.DialogText;
 import cat.jiu.dialog.iface.IDialogOptionDataUnit;
 import cat.jiu.dialog.iface.IDialogText;
+
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ResourceLocation;
 
@@ -13,10 +14,11 @@ public class TestDataUnit implements IDialogOptionDataUnit {
 	public IDialogText getOptionText() {
 		return new DialogText(false, "dialog.text.custom_option");
 	}
-
+	
+	protected static final NBTTagCompound nbt = new NBTTagCompound();
 	@Override
 	public NBTTagCompound writeToNBT() {
-		return new NBTTagCompound();
+		return nbt;
 	}
 
 	@Override

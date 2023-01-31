@@ -10,7 +10,7 @@ import net.minecraftforge.fml.common.eventhandler.Event;
  * 注意: 事件会在服务端与客户端各触发一次
  * @author small_jiu
  */
-public class DialogOptionEvent extends Event {
+public class OptionEvent extends Event {
 	public final EntityPlayer player;
 	/**
 	 * 对话框的ID
@@ -20,7 +20,7 @@ public class DialogOptionEvent extends Event {
 	 * 选项的ID
 	 */
 	public final int optionID;
-	public DialogOptionEvent(EntityPlayer player, ResourceLocation dialogID, int optionIndex) {
+	public OptionEvent(EntityPlayer player, ResourceLocation dialogID, int optionIndex) {
 		this.player = player;
 		this.dialogID = dialogID;
 		this.optionID = optionIndex;
@@ -32,7 +32,7 @@ public class DialogOptionEvent extends Event {
 	 * @author small_jiu
 	 */
 	@Cancelable
-	public static class ButtonClick extends DialogOptionEvent {
+	public static class ButtonClick extends OptionEvent {
 		/**
 		 * 点击时使用的鼠标按键ID
 		 */
@@ -49,7 +49,7 @@ public class DialogOptionEvent extends Event {
 	 * @author small_jiu
 	 */
 	@Cancelable
-	public static class TextConfirm extends DialogOptionEvent {
+	public static class TextConfirm extends OptionEvent {
 		/**
 		 * 文本框的文本
 		 */

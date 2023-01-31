@@ -72,31 +72,31 @@ public class DialogAPI {
 		}
 	}
 	
-	public static boolean hasRegisterOption(ResourceLocation type) {
-		return registry.containsKey(type);
+	public static boolean hasRegisterOption(ResourceLocation id) {
+		return registry.containsKey(id);
 	}
 	
-	public static IDialogOptionDataUnit newInstance(ResourceLocation typeID, NBTTagCompound nbt) throws Exception {
-		if(registry.containsKey(typeID)) {
-			return registry.get(typeID).getDataUnit(nbt);
+	public static IDialogOptionDataUnit newInstance(ResourceLocation id, NBTTagCompound nbt) throws Exception {
+		if(registry.containsKey(id)) {
+			return registry.get(id).getDataUnit(nbt);
 		}
-		ModMain.log.warn("Dialog Option is not register, option type id: {}", typeID);
+		ModMain.log.warn("Dialog Option is not register, option type id: {}", id);
 		return null;
 	}
-	public static IDialogOptionDataUnit newInstance(ResourceLocation typeID, JsonObject json) throws Exception {
-		if(registry.containsKey(typeID)) {
-			return registry.get(typeID).getDataUnit(json);
+	public static IDialogOptionDataUnit newInstance(ResourceLocation id, JsonObject json) throws Exception {
+		if(registry.containsKey(id)) {
+			return registry.get(id).getDataUnit(json);
 		}
-		ModMain.log.warn("Dialog Option is not register, option type id: {}", typeID);
+		ModMain.log.warn("Dialog Option is not register, option type id: {}", id);
 		return null;
 	}
 	
 	@SideOnly(Side.CLIENT)
-	public static DialogOptionDrawUnit getDrawUnit(ResourceLocation typeID, ResourceLocation dialogID, int optionID, IDialogOptionDataUnit option, DialogDimension dim) {
-		if(registry.containsKey(typeID)) {
-			return registry.get(typeID).getDrawUnit(dialogID, optionID, option, dim);
+	public static DialogOptionDrawUnit getDrawUnit(ResourceLocation id, ResourceLocation dialogID, int optionID, IDialogOptionDataUnit option, DialogDimension dim) {
+		if(registry.containsKey(id)) {
+			return registry.get(id).getDrawUnit(dialogID, optionID, option, dim);
 		}
-		ModMain.log.warn("Dialog Option is not register, option type id: {}", typeID);
+		ModMain.log.warn("Dialog Option is not register, option type id: {}", id);
 		return null;
 	}
 }

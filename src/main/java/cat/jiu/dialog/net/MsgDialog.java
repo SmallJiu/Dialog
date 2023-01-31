@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import cat.jiu.dialog.element.Dialog;
 import cat.jiu.dialog.ui.ContainerDialog;
+
 import io.netty.buffer.ByteBuf;
 
 import net.minecraft.client.Minecraft;
@@ -36,6 +37,7 @@ public class MsgDialog implements IMessage {
 	
 	public IMessage handler(MessageContext ctx) {
 		Container container = ctx.side.isClient() ? Minecraft.getMinecraft().player.openContainer : ctx.getServerHandler().player.openContainer;
+		
 		if(container instanceof ContainerDialog) {
 			((ContainerDialog) container).setDialog(dialog);
 		}

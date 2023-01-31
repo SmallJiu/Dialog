@@ -14,8 +14,9 @@ import cat.jiu.dialog.api.helper.DialogList;
 import cat.jiu.dialog.api.helper.DialogOperation;
 import cat.jiu.dialog.element.DialogText;
 import cat.jiu.dialog.element.option.DialogOptionDrawUnit;
-import cat.jiu.dialog.event.DialogOptionEvent;
+import cat.jiu.dialog.event.DialogEvent;
 import cat.jiu.dialog.iface.IDialogOptionDataUnit;
+import cat.jiu.dialog.utils.DialogConfig;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.init.Blocks;
@@ -24,6 +25,8 @@ import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextComponentTranslation;
 
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.config.Config;
+import net.minecraftforge.common.config.ConfigManager;
 import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -166,6 +169,9 @@ public class TestDialog {
 		list.getDialogOperation(main).setEditTextTask(4, (p, s)->{
 			if(p.world.isRemote) p.sendMessage(new TextComponentTranslation("dialog.dev.0.text.4.msg", s));
 		});
+		
+		DialogConfig.Enable_Test_Dialog = false;
+		ConfigManager.sync(ModMain.MODID, Config.Type.INSTANCE);
 	}
 	
 	@SubscribeEvent
@@ -174,14 +180,15 @@ public class TestDialog {
 			DialogAPI.displayDialog(event.getPlayer(), list.getDialogOperation(main).getDialog());
 		}
 	}
-
-	@SubscribeEvent
-	public void onOptionClick(DialogOptionEvent.ButtonClick event) {
-		event.player.sendMessage(new TextComponentString(String.format("isRemote: %s, Dialog: %s, Option: %s, Button: %s", event.player.world.isRemote, event.dialogID, event.optionID, event.mouseButton)));
-	}
 	
 	@SubscribeEvent
-	public void onTextConfirmClick(DialogOptionEvent.TextConfirm event) {
-		event.player.sendMessage(new TextComponentString(String.format("isRemote: %s, Dialog: %s, Option: %s, Text: %s", event.player.world.isRemote, event.dialogID, event.optionID, event.getText())));
+	public void onOpenDialog(DialogEvent.Open event) {
+		String side = event.player.world.isRemote ? "Client" : "Server";
+		event.player.sendMessage(new TextComponentString("Player on " + side + " Open Dialog"));
+	}
+	@SubscribeEvent
+	public void onCloseDialog(DialogEvent.Close event) {
+		String side = event.player.world.isRemote ? "Client" : "Server";
+		event.player.sendMessage(new TextComponentString("Player on " + side + " Close Dialog"));
 	}
 }

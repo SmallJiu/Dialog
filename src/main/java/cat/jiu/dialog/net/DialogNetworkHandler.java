@@ -20,9 +20,10 @@ public class DialogNetworkHandler {
 		this.channel = NetworkRegistry.INSTANCE.newSimpleChannel(ModMain.MODID);
 		
 		this.channel.registerMessage(MsgDialog::handler, MsgDialog.class, nextID(), Side.SERVER);
-		this.channel.registerMessage(MsgOptionEvent::handler, MsgOptionEvent.class, nextID(), Side.SERVER);
-		
 		this.channel.registerMessage(MsgDialog::handler, MsgDialog.class, nextID(), Side.CLIENT);
+		this.channel.registerMessage(MsgOptionEvent::handler, MsgOptionEvent.class, nextID(), Side.SERVER);
+		this.channel.registerMessage(MsgDialogEvent::handler, MsgDialogEvent.class, nextID(), Side.SERVER);
+		
 	}
 	
 	/** server to client */
