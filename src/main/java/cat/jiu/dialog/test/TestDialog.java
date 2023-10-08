@@ -4,52 +4,48 @@ import java.io.InputStreamReader;
 
 import com.google.gson.JsonParser;
 
+import cat.jiu.core.api.ITimer;
+import cat.jiu.core.api.element.IText;
 import cat.jiu.dialog.DialogAPI;
 import cat.jiu.dialog.ModMain;
-import cat.jiu.dialog.api.BaseDialogOptionType;
-import cat.jiu.dialog.api.ButtonDisplayDialog;
-import cat.jiu.dialog.api.DialogBuilder;
-import cat.jiu.dialog.api.DialogDimension;
 import cat.jiu.dialog.api.helper.DialogList;
 import cat.jiu.dialog.api.helper.DialogOperation;
-import cat.jiu.dialog.element.DialogText;
-import cat.jiu.dialog.element.option.DialogOptionDrawUnit;
+import cat.jiu.dialog.element.DialogOption;
+import cat.jiu.dialog.element.option.OptionCheckbox;
+import cat.jiu.dialog.element.option.OptionItemCheckbox;
+import cat.jiu.dialog.element.option.OptionItemRadioButton;
+import cat.jiu.dialog.element.option.OptionRadioButton;
+import cat.jiu.dialog.element.option.timer.OptionTimerCheckbox;
+import cat.jiu.dialog.element.option.timer.OptionTimerItemCheckbox;
+import cat.jiu.dialog.element.option.timer.OptionTimerItemRadioButton;
+import cat.jiu.dialog.element.option.timer.OptionTimerRadioButton;
 import cat.jiu.dialog.event.DialogEvent;
-import cat.jiu.dialog.iface.IDialogOptionDataUnit;
-import cat.jiu.dialog.utils.DialogConfig;
-
-import net.minecraft.client.Minecraft;
+import cat.jiu.dialog.utils.ButtonDisplayDialog;
+import cat.jiu.dialog.utils.DialogBuilder;
 import net.minecraft.init.Blocks;
+import net.minecraft.init.Items;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.TextComponentString;
-import net.minecraft.util.text.TextComponentTranslation;
 
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.common.config.Config;
-import net.minecraftforge.common.config.ConfigManager;
 import net.minecraftforge.event.world.BlockEvent;
-import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.relauncher.Side;
 
 /**
- * example from Sea of Thieves
  * @author small_jiu
  */
-@EventBusSubscriber
 public class TestDialog {
 	private static JsonParser parser;
 	public static JsonParser getJsonParser() {
 		if(parser==null) parser = new JsonParser();
 		return parser;
 	}
-	private static BaseDialogOptionType testOption;
-	public static BaseDialogOptionType getTestOption() {
+	private static DialogOption<TestDataUnit> testOption;
+	public static DialogOption<TestDataUnit> getTestOption() {
 		if(testOption==null) {
-			testOption = new BaseDialogOptionType(new ResourceLocation(ModMain.MODID, "test_option"), TestDataUnit.class) {
-					public DialogOptionDrawUnit getDrawUnit(ResourceLocation dialogID, int optionID, IDialogOptionDataUnit option, DialogDimension dialogDimension) {
-						return new TestDrawUnit(dialogID, option, optionID, Minecraft.getMinecraft().fontRenderer, dialogDimension);
-					}
-				};
+			testOption = DialogOption.register(new ResourceLocation(ModMain.MODID, "test_option"), TestDataUnit.class);
 		}
 		return testOption;
 	}
@@ -58,137 +54,287 @@ public class TestDialog {
 	
 	public final DialogList list;
 	
-	public TestDialog(boolean useJson) {
+	public TestDialog(boolean saveTaskToJson) {
 		MinecraftForge.EVENT_BUS.register(this);
 		getTestOption();
+		DialogList list_ = null;
 		
-		if(useJson) {
-			list = DialogList.get(getJsonParser().parse(new InputStreamReader(TestDialog.class.getResourceAsStream("/dialog_example.json"))).getAsJsonObject());
-		}else {
-			list = new DialogList(true);
+		try {
+			list_ = DialogList.get(getJsonParser().parse(new InputStreamReader(TestDialog.class.getResourceAsStream("/dialog_example.json"))).getAsJsonObject());
+		}catch(Exception e) {
+			list_ = new DialogList(true);
+			DialogList list = list_;
 			
-			ResourceLocation main_0_0 = new ResourceLocation(ModMain.MODID, "test_main_0_0");
-			ResourceLocation main_1_0 = new ResourceLocation(ModMain.MODID, "test_main_1_0");
-			ResourceLocation main_2_0 = new ResourceLocation(ModMain.MODID, "test_main_2_0");
-			ResourceLocation main_3_0 = new ResourceLocation(ModMain.MODID, "test_main_3_0");
+			ResourceLocation checkbox = new ResourceLocation(ModMain.MODID, "checkbox");
+			ResourceLocation radio = new ResourceLocation(ModMain.MODID, "radio");
+			ResourceLocation item = new ResourceLocation(ModMain.MODID, "item");
+			ResourceLocation timer = new ResourceLocation(ModMain.MODID, "timer");
 			
-			list.addDialogOperation(main, new DialogOperation(new DialogBuilder(main, new DialogText("dialog.dev.0.title"))
-						.addButton(new DialogText("dialog.dev.0.btn.0"))
-						.addButtonTooltip(0, new DialogText("dialog.dev.info"))
-						.addButton(new DialogText("dialog.dev.0.btn.1"))
-						.addButton(new DialogText("dialog.dev.0.btn.2"))
-						.addButton(new DialogText("dialog.dev.0.btn.3"))
-						.addTextField(new DialogText("dialog.dev.0.text.4"), true)
-						.addTextFieldTooltip(4, new DialogText("dialog.dev.info"))
+			list.addDialogOperation(main, new DialogOperation(
+					new DialogBuilder(IText.from("All option example in this dialog."))
+						.addButton(IText.from("A button option.3211111111111111111111111111111111111111111111111111111111111q6w+eg4f586q6g5ew6rg54q65e+wrg4q6+erg546qr5g46"))
+						.addTextField(IText.from("A text option"), false)
+						.addButton(IText.from("All checkbox option in sub dialog."))
+						.addButton(IText.from("All radio button option in sub dialog."))
+						.addButton(IText.from("All item options in sub dialog."))
+						.addButton(IText.from("All timer options in sub dialog."))
 						.addOption(new TestDataUnit())
-						
-					)
-					.setButtonTask(0, new ButtonDisplayDialog(list, main_0_0))
-					.setButtonTask(1, new ButtonDisplayDialog(list, main_1_0))
-					.setButtonTask(2, new ButtonDisplayDialog(list, main_2_0))
-					.setButtonTask(3, new ButtonDisplayDialog(list, main_3_0)));
+					, saveTaskToJson));
+			DialogOperation main = list.getDialogOperation(TestDialog.main);
+			main.setButtonTask(0, (parent, dialog, option, player, mouseButton)->{
+				player.sendMessage(new TextComponentString("=============="));
+				player.sendMessage(new TextComponentString(String.format("CallSide: %s, DialogID: %s, OptionIndex: %s, Player: %s, ClickButton: %s", player.world.isRemote ? Side.CLIENT : Side.SERVER, dialog, option, player.getName(), mouseButton)));
+			});
+			main.setEditTextTask(1, (parent, dialog, option, player, text)->{
+				player.sendMessage(new TextComponentString("=============="));
+				player.sendMessage(new TextComponentString(String.format("CallSide: %s, DialogID: %s, OptionIndex: %s, Player: %s, InputText: '%s'", player.world.isRemote ? Side.CLIENT : Side.SERVER, dialog, option, player.getName(), text)));
+			});
+			main.setButtonTask(2, new ButtonDisplayDialog(list, checkbox));
+			main.setButtonTask(3, new ButtonDisplayDialog(list, radio));
+			main.setButtonTask(4, new ButtonDisplayDialog(list, item));
+			main.setButtonTask(5, new ButtonDisplayDialog(list, timer));
 			
+			// checkbox
+			list.addDialogOperation(checkbox, new DialogOperation(new DialogBuilder(IText.from("All checkbox option in this dialog. I not recommended more than one checkbox option in one dialog, it may create bug."))
+					.addOption(new OptionCheckbox(false, 4, new int[] {1},
+							IText.from("a check option"), IText.from("a check option"), IText.from("a check option"), IText.from("a check option"), IText.from("a check option") 
+					))
+					.addTextField(IText.from("Just a separate."), false)
+					.addOption(new OptionItemCheckbox(false, 4, null,
+							new ItemStack(Items.DIAMOND,1), new ItemStack(Items.DIAMOND,1), new ItemStack(Items.DIAMOND,4),  new ItemStack(Items.DIAMOND,5), new ItemStack(Items.DIAMOND,1), new ItemStack(Items.DIAMOND,4) 
+					))
+					, saveTaskToJson)
+			);
 			
-			ResourceLocation main_0_1 = new ResourceLocation(ModMain.MODID, "test_main_0_1");
-			ResourceLocation main_0_2 = new ResourceLocation(ModMain.MODID, "test_main_0_2");
-			ResourceLocation main_0_3 = new ResourceLocation(ModMain.MODID, "test_main_0_3");
-			ResourceLocation main_0_4 = new ResourceLocation(ModMain.MODID, "test_main_0_4");
-			list.addDialogOperation(main_0_0, new DialogOperation(new DialogBuilder(new DialogText("dialog.dev.100.title"))
-					.addButton(new DialogText("dialog.text.continue")))
-				.setButtonTask(0, new ButtonDisplayDialog(list, new ResourceLocation(ModMain.MODID, "test_main_0_1"))));
+			list.getDialogOperation(checkbox)
+				.setCheckBoxCheckTask(0, (parent, dialog, option, player, selectIndex, selectString, remove)->{
+					player.sendMessage(new TextComponentString("=============="));
+					player.sendMessage(new TextComponentString(String.format("CallSide: %s, DialogID: %s, OptionIndex: %s, Player: %s, OptionText: '%s', OptionIndex: %s, RemoveOption: %s", player.world.isRemote ? Side.CLIENT : Side.SERVER, dialog, option, player.getName(), selectString, selectIndex, remove)));
+				})
+				.setCheckBoxConfirmTask(0, (parent, dialog, option, player, selects)->{
+					player.sendMessage(new TextComponentString("=============="));
+					player.sendMessage(new TextComponentString(String.format("CallSide: %s, DialogID: %s, OptionIndex: %s, Player: %s, Selects: '%s'", player.world.isRemote ? Side.CLIENT : Side.SERVER, dialog, option, player.getName(), selects)));
+					if(player.world.isRemote) {
+						list.display(player, TestDialog.main);
+					}
+				})
+				.setItemCheckboxSelectTask(2, (parent, dialog, option, player, selectIndex, stack, remove)->{
+					player.sendMessage(new TextComponentString("=============="));
+					player.sendMessage(new TextComponentString(String.format("CallSide: %s, DialogID: %s, OptionIndex: %s, Player: %s, SelectItem: '%s', SelectIndex: %s, SelectRemove: %s", player.world.isRemote ? Side.CLIENT : Side.SERVER, dialog, option, player.getName(), stack, selectIndex, remove)));
+				})
+				.setItemCheckboxConfirmTask(2, (parent, dialog, option, player, selects)->{
+					player.sendMessage(new TextComponentString("=============="));
+					player.sendMessage(new TextComponentString(String.format("CallSide: %s, DialogID: %s, OptionIndex: %s, Player: %s, Selects: '%s'", player.world.isRemote ? Side.CLIENT : Side.SERVER, dialog, option, player.getName(), selects)));
+					if(player.world.isRemote) {
+						list.display(player, TestDialog.main);
+					}
+				});
 			
-			list.addDialogOperation(main_0_1, new DialogOperation(new DialogBuilder(new DialogText("dialog.dev.101.title"))
-					.addButton(new DialogText("dialog.text.continue")))
-				.setButtonTask(0, new ButtonDisplayDialog(list, main_0_2)));
-
-			list.addDialogOperation(main_0_2, new DialogOperation(new DialogBuilder(new DialogText("dialog.dev.102.title"))
-					.addButton(new DialogText("dialog.text.continue")))
-				.setButtonTask(0, new ButtonDisplayDialog(list, main_0_3)));
-
-			list.addDialogOperation(main_0_3, new DialogOperation(new DialogBuilder(new DialogText("dialog.dev.103.title"))
-					.addButton(new DialogText("dialog.text.continue")))
-				.setButtonTask(0, new ButtonDisplayDialog(list, main_0_4)));
-
-			list.addDialogOperation(main_0_4, new DialogOperation(new DialogBuilder(new DialogText("dialog.dev.104.title"))
-					.addButton(new DialogText("dialog.text.back")))
-				.setButtonTask(0, new ButtonDisplayDialog(list, main)));
+			// radio
+			list.addDialogOperation(radio, new DialogOperation(new DialogBuilder(IText.from("All checkbox option in this dialog. I not recommended more than one radio button option in one dialog, it may create bug."))
+					.addOption(new OptionRadioButton(false, 4, 1,
+							IText.from("a check option"), IText.from("a check option"), IText.from("a check option"), IText.from("a check option"), IText.from("a check option") 
+					))
+					.addTextField(IText.from("Just a separate."), false)
+					.addOption(new OptionItemRadioButton(false, 4, 0,
+							new ItemStack(Items.DIAMOND,1), new ItemStack(Items.DIAMOND,1), new ItemStack(Items.DIAMOND,4),  new ItemStack(Items.DIAMOND,5), new ItemStack(Items.DIAMOND,1), new ItemStack(Items.DIAMOND,4) 
+					))
+					, saveTaskToJson)
+			);
 			
-			ResourceLocation main_1_1 = new ResourceLocation(ModMain.MODID, "test_main_1_1");
-			ResourceLocation main_1_2 = new ResourceLocation(ModMain.MODID, "test_main_1_2");
-			ResourceLocation main_1_3 = new ResourceLocation(ModMain.MODID, "test_main_1_3");
-			list.addDialogOperation(main_1_0, new DialogOperation(new DialogBuilder(new DialogText("dialog.dev.200.title"))
-					.addButton(new DialogText("dialog.text.continue")))
-				.setButtonTask(0, new ButtonDisplayDialog(list, main_1_1)));
-
-			list.addDialogOperation(main_1_1, new DialogOperation(new DialogBuilder(new DialogText("dialog.dev.201.title"))
-					.addButton(new DialogText("dialog.text.continue")))
-				.setButtonTask(0, new ButtonDisplayDialog(list, main_1_2)));
-
-			list.addDialogOperation(main_1_2, new DialogOperation(new DialogBuilder(new DialogText("dialog.dev.202.title"))
-					.addButton(new DialogText("dialog.text.continue")))
-				.setButtonTask(0, new ButtonDisplayDialog(list, main_1_3)));
-
-			list.addDialogOperation(main_1_3, new DialogOperation(new DialogBuilder(new DialogText("dialog.dev.203.title"))
-					.addButton(new DialogText("dialog.text.back")))
-				.setButtonTask(0, new ButtonDisplayDialog(list, main)));
+			list.getDialogOperation(radio)
+				.setRadioButtonTask(0, (parent, dialog, option, player, selectIndex, optionString, confirm)->{
+					player.sendMessage(new TextComponentString("=============="));
+					player.sendMessage(new TextComponentString(String.format("CallSide: %s, DialogID: %s, OptionIndex: %s, Player: %s, SelectIndex: %s, SelectText: '%s', Confirm: %s", player.world.isRemote ? Side.CLIENT : Side.SERVER, dialog, option, player.getName(), selectIndex, optionString, confirm)));
+					if(player.world.isRemote && confirm) {
+						list.display(player, TestDialog.main);
+					}
+				})
+				.setItemRadioButtonTask(2, (parent, dialog, option, player, selectIndex, stack, confirm)->{
+					player.sendMessage(new TextComponentString("=============="));
+					player.sendMessage(new TextComponentString(String.format("CallSide: %s, DialogID: %s, OptionIndex: %s, Player: %s, SelectIndex: %s, SelectItem: '%s', Confirm: %s", player.world.isRemote ? Side.CLIENT : Side.SERVER, dialog, option, player.getName(), selectIndex, stack, confirm)));
+					if(player.world.isRemote && confirm) {
+						list.display(player, TestDialog.main);
+					}
+				});
 			
-			ResourceLocation main_2_1 = new ResourceLocation(ModMain.MODID, "test_main_2_1");
-			ResourceLocation main_2_2 = new ResourceLocation(ModMain.MODID, "test_main_2_2");
-			list.addDialogOperation(main_2_0, new DialogOperation(new DialogBuilder(new DialogText("dialog.dev.300.title"))
-					.addButton(new DialogText("dialog.text.continue")))
-				.setButtonTask(0, new ButtonDisplayDialog(list, main_2_1)));
-
-			list.addDialogOperation(main_2_1, new DialogOperation(new DialogBuilder(new DialogText("dialog.dev.301.title"))
-					.addButton(new DialogText("dialog.text.continue")))
-				.setButtonTask(0, new ButtonDisplayDialog(list, main_2_2)));
-
-			list.addDialogOperation(main_2_2, new DialogOperation(new DialogBuilder(new DialogText("dialog.dev.302.title"))
-					.addButton(new DialogText("dialog.text.back")))
-				.setButtonTask(0, new ButtonDisplayDialog(list, main)));
+			// item
+			list.addDialogOperation(item, new DialogOperation(new DialogBuilder(IText.from("All item option in this dialog. You can enable time expire auto confirm on timer option. I not recommended more than one radio button option in one dialog, it may create bug."))
+					.addButton(IText.from("Normal item checkbox."))
+					.addButton(IText.from("Timer item checkbox."))
+					.addButton(IText.from("Normal item radio button."))
+					.addButton(IText.from("Timer item radio button."))
+					.addButton(IText.from("Back.").setCenter(true))
+					, saveTaskToJson)
+			);
+			list.getDialogOperation(item)
+				.setButtonTask(0, new ButtonDisplayDialog(list, new ResourceLocation(ModMain.MODID, "normal_item_checkbox")))
+				.setButtonTask(1, new ButtonDisplayDialog(list, new ResourceLocation(ModMain.MODID, "timer_item_checkbox")))
+				.setButtonTask(2, new ButtonDisplayDialog(list, new ResourceLocation(ModMain.MODID, "normal_item_radio")))
+				.setButtonTask(3, new ButtonDisplayDialog(list, new ResourceLocation(ModMain.MODID, "timer_item_radio")))
+				.setButtonTask(4, new ButtonDisplayDialog(list, TestDialog.main))
+			;
 			
-			ResourceLocation main_3_1 = new ResourceLocation(ModMain.MODID, "test_main_3_1");
-			ResourceLocation main_3_2 = new ResourceLocation(ModMain.MODID, "test_main_3_2");
-			ResourceLocation main_3_3 = new ResourceLocation(ModMain.MODID, "test_main_3_3");
-			list.addDialogOperation(main_3_0, new DialogOperation(new DialogBuilder(new DialogText("dialog.dev.400.title"))
-					.addButton(new DialogText("dialog.text.continue")))
-				.setButtonTask(0, new ButtonDisplayDialog(list, main_3_1)));
-
-			list.addDialogOperation(main_3_1, new DialogOperation(new DialogBuilder(new DialogText("dialog.dev.401.title"))
-					.addButton(new DialogText("dialog.text.continue")))
-				.setButtonTask(0, new ButtonDisplayDialog(list, main_3_2)));
-
-			list.addDialogOperation(main_3_2, new DialogOperation(new DialogBuilder(new DialogText("dialog.dev.402.title"))
-					.addButton(new DialogText("dialog.text.continue")))
-				.setButtonTask(0, new ButtonDisplayDialog(list, main_3_3)));
-
-			list.addDialogOperation(main_3_3, new DialogOperation(new DialogBuilder(new DialogText("dialog.dev.403.title"))
-					.addButton(new DialogText("dialog.text.back")))
-				.setButtonTask(0, new ButtonDisplayDialog(list, main)));
+			list.addDialogOperation(new ResourceLocation(ModMain.MODID, "normal_item_checkbox"), new DialogOperation(new DialogBuilder(IText.from("I not recommended more than one radio button option in one dialog, it may create bug."))
+					.addOption(new OptionItemCheckbox(false, 4, new int[] {0}, 
+							new ItemStack(Items.DIAMOND,1), new ItemStack(Items.DIAMOND,1), new ItemStack(Items.DIAMOND,4),  new ItemStack(Items.DIAMOND,5), new ItemStack(Items.DIAMOND,1), new ItemStack(Items.DIAMOND,4)
+					)), saveTaskToJson)
+			);
+			list.getDialogOperation(new ResourceLocation(ModMain.MODID, "normal_item_checkbox"))
+				.setItemCheckboxSelectTask(0, (parent, dialog, option, player, selectIndex, stack, remove)->{
+					player.sendMessage(new TextComponentString("=============="));
+					player.sendMessage(new TextComponentString(String.format("CallSide: %s, DialogID: %s, OptionIndex: %s, Player: %s, SelectItem: '%s', SelectIndex: %s, SelectRemove: %s", player.world.isRemote ? Side.CLIENT : Side.SERVER, dialog, option, player.getName(), stack, selectIndex, remove)));
+				})
+				.setItemCheckboxConfirmTask(0, (parent, dialog, option, player, selects)->{
+					player.sendMessage(new TextComponentString("=============="));
+					player.sendMessage(new TextComponentString(String.format("CallSide: %s, DialogID: %s, OptionIndex: %s, Player: %s, Selects: '%s'", player.world.isRemote ? Side.CLIENT : Side.SERVER, dialog, option, player.getName(), selects)));
+					if(player.world.isRemote) {
+						if(parent!=null) {
+							list.display(player, parent);
+						}else {
+							list.display(player, item);
+						}
+					}
+				});
+			
+			list.addDialogOperation(new ResourceLocation(ModMain.MODID, "timer_item_checkbox"), new DialogOperation(new DialogBuilder(IText.from("You can enable time expire auto confirm on timer option. I not recommended more than one radio button option in one dialog, it may create bug."))
+					.addOption(new OptionTimerItemCheckbox(ITimer.from(false, 30, 19, 999), false, new OptionItemCheckbox(false, 3, new int[] {0}, 
+							new ItemStack(Items.DIAMOND,1), new ItemStack(Items.DIAMOND,1), new ItemStack(Items.DIAMOND,4),  new ItemStack(Items.DIAMOND,5), new ItemStack(Items.DIAMOND,1), new ItemStack(Items.DIAMOND,4)
+					))), saveTaskToJson));
+			
+			list.getDialogOperation(new ResourceLocation(ModMain.MODID, "timer_item_checkbox"))
+				.setItemCheckboxSelectTask(0, (parent, dialog, option, player, selectIndex, stack, remove)->{
+					player.sendMessage(new TextComponentString("=============="));
+					player.sendMessage(new TextComponentString(String.format("CallSide: %s, DialogID: %s, OptionIndex: %s, Player: %s, SelectItem: '%s', SelectIndex: %s, SelectRemove: %s", player.world.isRemote ? Side.CLIENT : Side.SERVER, dialog, option, player.getName(), stack, selectIndex, remove)));
+				})
+				.setItemCheckboxConfirmTask(0, (parent, dialog, option, player, selects)->{
+					player.sendMessage(new TextComponentString("=============="));
+					player.sendMessage(new TextComponentString(String.format("CallSide: %s, DialogID: %s, OptionIndex: %s, Player: %s, Selects: '%s'", player.world.isRemote ? Side.CLIENT : Side.SERVER, dialog, option, player.getName(), selects)));
+					if(player.world.isRemote) {
+						if(parent!=null) {
+							list.display(player, parent);
+						}else {
+							list.display(player, item);
+						}
+					}
+				});
+			
+			list.addDialogOperation(new ResourceLocation(ModMain.MODID, "normal_item_radio"), new DialogOperation(new DialogBuilder(IText.from("I not recommended more than one radio button option in one dialog, it may create bug."))
+					.addOption(new OptionItemRadioButton(false, 4, 0,
+							new ItemStack(Items.DIAMOND,1), new ItemStack(Items.DIAMOND,1), new ItemStack(Items.DIAMOND,4),  new ItemStack(Items.DIAMOND,5), new ItemStack(Items.DIAMOND,1), new ItemStack(Items.DIAMOND,4) 
+					)), saveTaskToJson)
+			);
+			list.getDialogOperation(new ResourceLocation(ModMain.MODID, "normal_item_radio"))
+				.setItemRadioButtonTask(0, (parent, dialog, option, player, selectIndex, stack, confirm)->{
+					player.sendMessage(new TextComponentString("=============="));
+					player.sendMessage(new TextComponentString(String.format("CallSide: %s, DialogID: %s, OptionIndex: %s, Player: %s, SelectItem: '%s', SelectIndex: %s, Confirm: %s", player.world.isRemote ? Side.CLIENT : Side.SERVER, dialog, option, player.getName(), stack, selectIndex, confirm)));
+					if(player.world.isRemote && confirm) {
+						if(parent!=null) {
+							list.display(player, parent);
+						}else {
+							list.display(player, item);
+						}
+					}
+				});
+			
+			list.addDialogOperation(new ResourceLocation(ModMain.MODID, "timer_item_radio"), new DialogOperation(new DialogBuilder(IText.from("You can enable time expire auto confirm on timer option. I not recommended more than one radio button option in one dialog, it may create bug."))
+					.addOption(new OptionTimerItemRadioButton(ITimer.from(false, 30, 19, 999), false, new OptionItemRadioButton(false, 4, 0,
+							new ItemStack(Items.DIAMOND,1), new ItemStack(Items.DIAMOND,1), new ItemStack(Items.DIAMOND,4),  new ItemStack(Items.DIAMOND,5), new ItemStack(Items.DIAMOND,1), new ItemStack(Items.DIAMOND,4) 
+					))), saveTaskToJson)
+			);
+			list.getDialogOperation(new ResourceLocation(ModMain.MODID, "timer_item_radio"))
+				.setItemRadioButtonTask(0, (parent, dialog, option, player, selectIndex, stack, confirm)->{
+					player.sendMessage(new TextComponentString("=============="));
+					player.sendMessage(new TextComponentString(String.format("CallSide: %s, DialogID: %s, OptionIndex: %s, Player: %s, SelectIndex: %s, SelectItem: '%s', Confirm: %s", player.world.isRemote ? Side.CLIENT : Side.SERVER, dialog, option, player.getName(), selectIndex, stack, confirm)));
+					if(player.world.isRemote && confirm) {
+						if(parent!=null) {
+							list.display(player, parent);
+						}else {
+							list.display(player, item);
+						}
+					}
+				});
+			
+			// timer
+			
+			list.addDialogOperation(timer, new DialogOperation(new DialogBuilder(IText.from("All timer option in this dialog. You can enable time expire auto confirm on timer option. I not recommended more than one radio button option in one dialog, it may create bug."))
+					.addButton(IText.from("Timer checkbox."))
+					.addButton(IText.from("Timer item checkbox."))
+					.addButton(IText.from("Timer radio button."))
+					.addButton(IText.from("Timer item radio button."))
+					.addButton(IText.from("Back.").setCenter(true))
+					, saveTaskToJson)
+			);
+			list.getDialogOperation(timer)
+				.setButtonTask(0, new ButtonDisplayDialog(list, new ResourceLocation(ModMain.MODID, "timer_checkbox")))
+				.setButtonTask(1, new ButtonDisplayDialog(list, new ResourceLocation(ModMain.MODID, "timer_item_checkbox")))
+				.setButtonTask(2, new ButtonDisplayDialog(list, new ResourceLocation(ModMain.MODID, "timer_radio")))
+				.setButtonTask(3, new ButtonDisplayDialog(list, new ResourceLocation(ModMain.MODID, "timer_item_radio")))
+				.setButtonTask(4, new ButtonDisplayDialog(list, TestDialog.main));
+			
+			list.addDialogOperation(new ResourceLocation(ModMain.MODID, "timer_checkbox"), new DialogOperation(new DialogBuilder(IText.from("You can enable time expire auto confirm on timer option. I not recommended more than one radio button option in one dialog, it may create bug."))
+					.addOption(new OptionTimerCheckbox(ITimer.from(false, 29, 19, 999), false, new OptionCheckbox(false, 4, new int[] {0,3}, 
+								IText.from("a check option"), IText.from("a check option"), IText.from("a check option"), IText.from("a check option"), IText.from("a check option")
+							)))
+					, saveTaskToJson));
+			list.getDialogOperation(new ResourceLocation(ModMain.MODID, "timer_checkbox"))
+				.setCheckBoxCheckTask(0, (parent, dialog, option, player, selectIndex, selectString, remove)->{
+					player.sendMessage(new TextComponentString("=============="));
+					player.sendMessage(new TextComponentString(String.format("CallSide: %s, DialogID: %s, OptionIndex: %s, Player: %s, OptionIndex: %s, OptionText: '%s', RemoveOption: %s", player.world.isRemote ? Side.CLIENT : Side.SERVER, dialog, option, player.getName(), selectIndex, selectString, remove)));
+				})
+				.setCheckBoxConfirmTask(0, (parent, dialog, option, player, selects)->{
+					player.sendMessage(new TextComponentString("=============="));
+					player.sendMessage(new TextComponentString(String.format("CallSide: %s, DialogID: %s, OptionIndex: %s, Player: %s, Selects: '%s'", player.world.isRemote ? Side.CLIENT : Side.SERVER, dialog, option, player.getName(), selects)));
+					if(player.world.isRemote) {
+						if(parent!=null) {
+							list.display(player, parent);
+						}else {
+							list.display(player, timer);
+						}
+					}
+				});
+			
+			list.addDialogOperation(new ResourceLocation(ModMain.MODID, "timer_radio"), new DialogOperation(new DialogBuilder(IText.from("You can enable time expire auto confirm on timer option. I not recommended more than one radio button option in one dialog, it may create bug."))
+					.addOption(new OptionTimerRadioButton(ITimer.from(false, 29, 19, 999), false, new OptionRadioButton(false, 4, 3, 
+								IText.from("a check option"), IText.from("a check option"), IText.from("a check option"), IText.from("a check option"), IText.from("a check option")
+							)))
+					, saveTaskToJson));
+			list.getDialogOperation(new ResourceLocation(ModMain.MODID, "timer_radio"))
+				.setRadioButtonTask(0, (parent, dialog, option, player, selectIndex, optionString, confirm)->{
+					player.sendMessage(new TextComponentString("=============="));
+					player.sendMessage(new TextComponentString(String.format("CallSide: %s, DialogID: %s, OptionIndex: %s, Player: %s, SelectIndex: %s, SelectText: '%s', Confirm: %s", player.world.isRemote ? Side.CLIENT : Side.SERVER, dialog, option, player.getName(), selectIndex, optionString, confirm)));
+					if(player.world.isRemote && confirm) {
+						if(parent!=null) {
+							list.display(player, parent);
+						}else {
+							list.display(player, timer);
+						}
+					}
+				});
 		}
-		
-		list.getDialogOperation(main).setEditTextTask(4, (p, s)->{
-			if(p.world.isRemote) p.sendMessage(new TextComponentTranslation("dialog.dev.0.text.4.msg", s));
-		});
-		
-		DialogConfig.Enable_Test_Dialog = false;
-		ConfigManager.sync(ModMain.MODID, Config.Type.INSTANCE);
+		this.list = list_;
+	}
+	
+	public void unload() {
+		MinecraftForge.EVENT_BUS.unregister(this);
+		MinecraftForge.EVENT_BUS.unregister(this.list);
 	}
 	
 	@SubscribeEvent
 	public void breakBlock(BlockEvent.BreakEvent event) {
 		if(event.getState().getBlock() == Blocks.REDSTONE_BLOCK) {
-			DialogAPI.displayDialog(event.getPlayer(), list.getDialogOperation(main).getDialog());
+			DialogAPI.displayDialog(event.getPlayer(), list.getDialogOperation(main).copyDialog());
 		}
 	}
 	
 	@SubscribeEvent
 	public void onOpenDialog(DialogEvent.Open event) {
-		String side = event.player.world.isRemote ? "Client" : "Server";
-		event.player.sendMessage(new TextComponentString("Player on " + side + " Open Dialog"));
+//		String side = event.player.world.isRemote ? "Client" : "Server";
+//		event.player.sendMessage(new TextComponentString("Player on " + side + " Open Dialog"));
 	}
 	@SubscribeEvent
 	public void onCloseDialog(DialogEvent.Close event) {
-		String side = event.player.world.isRemote ? "Client" : "Server";
-		event.player.sendMessage(new TextComponentString("Player on " + side + " Close Dialog"));
+//		String side = event.player.world.isRemote ? "Client" : "Server";
+//		event.player.sendMessage(new TextComponentString("Player on " + side + " Close Dialog"));
 	}
 }

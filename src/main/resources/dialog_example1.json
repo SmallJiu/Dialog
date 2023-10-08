@@ -1,0 +1,730 @@
+{
+	"dialog": [{
+			"id": "dialog:test_main",
+			"option": [{
+					"data": {
+						"close": false,
+						"text": {
+							"text": "A button option.3211111111111111111111111111111111111111111111111111111111111q6w+eg4f586q6g5ew6rg54q65e+wrg4q6+erg546qr5g46+qrewg4q+erg4q+we64g+qsd59we8r4gwfdgb419we8r4gh9qwergb4w6c5gb16q8werg4698qws8g1cs63v16er58g4qwe698fdg485wfd741g65we4rfgh9w68e4rfgh96wegh46fgq+e9f4qw+efg4qwefgw4egf+qwe4g"
+						}
+					},
+					"tasks": [{
+							"clazz": "cat.jiu.dialog.test.TestDialog$$Lambda$178/407067059",
+							"data": {}
+						}
+					],
+					"type": "dialog:button"
+				}, {
+					"data": {
+						"close": false,
+						"text": "A text option"
+					},
+					"tasks": [{
+							"clazz": "cat.jiu.dialog.test.TestDialog$$Lambda$179/405964050",
+							"data": {}
+						}
+					],
+					"type": "dialog:text"
+				}, {
+					"data": {
+						"close": false,
+						"text": {
+							"text": "All checkbox option in sub dialog."
+						}
+					},
+					"tasks": [{
+							"clazz": "cat.jiu.dialog.utils.ButtonDisplayDialog",
+							"data": {
+								"next": "dialog:checkbox"
+							}
+						}
+					],
+					"type": "dialog:button"
+				}, {
+					"data": {
+						"close": false,
+						"text": {
+							"text": "All radio button option in sub dialog."
+						}
+					},
+					"tasks": [{
+							"clazz": "cat.jiu.dialog.utils.ButtonDisplayDialog",
+							"data": {
+								"next": "dialog:radio"
+							}
+						}
+					],
+					"type": "dialog:button"
+				}, {
+					"data": {
+						"close": false,
+						"text": {
+							"text": "All item options in sub dialog."
+						}
+					},
+					"tasks": [{
+							"clazz": "cat.jiu.dialog.utils.ButtonDisplayDialog",
+							"data": {
+								"next": "dialog:item"
+							}
+						}
+					],
+					"type": "dialog:button"
+				}, {
+					"data": {
+						"close": false,
+						"text": {
+							"text": "All timer options in sub dialog."
+						}
+					},
+					"tasks": [{
+							"clazz": "cat.jiu.dialog.utils.ButtonDisplayDialog",
+							"data": {
+								"next": "dialog:timer"
+							}
+						}
+					],
+					"type": "dialog:button"
+				}, {
+					"data": {
+						"text": "dialog.text.custom_option"
+					},
+					"type": "dialog:test_option"
+				}
+			],
+			"saveTask": true,
+			"text": "All option example in this dialog."
+		}, {
+			"id": "dialog:checkbox",
+			"option": [{
+					"data": {
+						"close": false,
+						"column": 4,
+						"default": [1],
+						"options": [{
+								"text": "a check option"
+							}, {
+								"text": "a check option"
+							}, {
+								"text": "a check option"
+							}, {
+								"text": "a check option"
+							}, {
+								"text": "a check option"
+							}
+						]
+					},
+					"tasks": [{
+							"clazz": "cat.jiu.dialog.test.TestDialog$$Lambda$182/1868428077",
+							"data": {}
+						}, {
+							"clazz": "cat.jiu.dialog.test.TestDialog$$Lambda$183/1634019152",
+							"data": {}
+						}
+					],
+					"type": "dialog:checkbox"
+				}, {
+					"data": {
+						"close": false,
+						"text": "Just a separate."
+					},
+					"type": "dialog:text"
+				}, {
+					"data": {
+						"close": false,
+						"column": 4,
+						"stacks": {
+							"0": {
+								"count": 1,
+								"meta": 0,
+								"name": "minecraft:diamond"
+							},
+							"1": {
+								"count": 1,
+								"meta": 0,
+								"name": "minecraft:diamond"
+							},
+							"2": {
+								"count": 4,
+								"meta": 0,
+								"name": "minecraft:diamond"
+							},
+							"3": {
+								"count": 5,
+								"meta": 0,
+								"name": "minecraft:diamond"
+							},
+							"4": {
+								"count": 1,
+								"meta": 0,
+								"name": "minecraft:diamond"
+							},
+							"5": {
+								"count": 4,
+								"meta": 0,
+								"name": "minecraft:diamond"
+							}
+						}
+					},
+					"tasks": [{
+							"clazz": "cat.jiu.dialog.test.TestDialog$$Lambda$184/390531601",
+							"data": {}
+						}, {
+							"clazz": "cat.jiu.dialog.test.TestDialog$$Lambda$185/1762170490",
+							"data": {}
+						}
+					],
+					"type": "dialog:item_checkbox"
+				}
+			],
+			"saveTask": true,
+			"text": "All checkbox option in this dialog. I not recommended more than one checkbox option in one dialog, it may create bug."
+		}, {
+			"id": "dialog:radio",
+			"option": [{
+					"data": {
+						"close": false,
+						"column": 4,
+						"options": [{
+								"text": "a check option"
+							}, {
+								"text": "a check option"
+							}, {
+								"text": "a check option"
+							}, {
+								"text": "a check option"
+							}, {
+								"text": "a check option"
+							}
+						],
+						"select": 1
+					},
+					"tasks": [{
+							"clazz": "cat.jiu.dialog.test.TestDialog$$Lambda$188/856562460",
+							"data": {}
+						}
+					],
+					"type": "dialog:radio_btn"
+				}, {
+					"data": {
+						"close": false,
+						"text": "Just a separate."
+					},
+					"type": "dialog:text"
+				}, {
+					"data": {
+						"close": false,
+						"column": 4,
+						"default": 0,
+						"stacks": {
+							"0": {
+								"count": 1,
+								"meta": 0,
+								"name": "minecraft:diamond"
+							},
+							"1": {
+								"count": 1,
+								"meta": 0,
+								"name": "minecraft:diamond"
+							},
+							"2": {
+								"count": 4,
+								"meta": 0,
+								"name": "minecraft:diamond"
+							},
+							"3": {
+								"count": 5,
+								"meta": 0,
+								"name": "minecraft:diamond"
+							},
+							"4": {
+								"count": 1,
+								"meta": 0,
+								"name": "minecraft:diamond"
+							},
+							"5": {
+								"count": 4,
+								"meta": 0,
+								"name": "minecraft:diamond"
+							}
+						}
+					},
+					"tasks": [{
+							"clazz": "cat.jiu.dialog.test.TestDialog$$Lambda$189/1556138535",
+							"data": {}
+						}
+					],
+					"type": "dialog:item_radio"
+				}
+			],
+			"saveTask": true,
+			"text": "All checkbox option in this dialog. I not recommended more than one radio button option in one dialog, it may create bug."
+		}, {
+			"id": "dialog:item",
+			"option": [{
+					"data": {
+						"close": false,
+						"text": {
+							"text": "Normal item checkbox."
+						}
+					},
+					"tasks": [{
+							"clazz": "cat.jiu.dialog.utils.ButtonDisplayDialog",
+							"data": {
+								"next": "dialog:normal_item_checkbox"
+							}
+						}
+					],
+					"type": "dialog:button"
+				}, {
+					"data": {
+						"close": false,
+						"text": {
+							"text": "Timer item checkbox."
+						}
+					},
+					"tasks": [{
+							"clazz": "cat.jiu.dialog.utils.ButtonDisplayDialog",
+							"data": {
+								"next": "dialog:timer_item_checkbox"
+							}
+						}
+					],
+					"type": "dialog:button"
+				}, {
+					"data": {
+						"close": false,
+						"text": {
+							"text": "Normal item radio button."
+						}
+					},
+					"tasks": [{
+							"clazz": "cat.jiu.dialog.utils.ButtonDisplayDialog",
+							"data": {
+								"next": "dialog:normal_item_radio"
+							}
+						}
+					],
+					"type": "dialog:button"
+				}, {
+					"data": {
+						"close": false,
+						"text": {
+							"text": "Timer item radio button."
+						}
+					},
+					"tasks": [{
+							"clazz": "cat.jiu.dialog.utils.ButtonDisplayDialog",
+							"data": {
+								"next": "dialog:timer_item_radio"
+							}
+						}
+					],
+					"type": "dialog:button"
+				}, {
+					"data": {
+						"close": false,
+						"text": {
+							"isCenter": true,
+							"text": "Back."
+						}
+					},
+					"tasks": [{
+							"clazz": "cat.jiu.dialog.utils.ButtonDisplayDialog",
+							"data": {
+								"next": "dialog:test_main"
+							}
+						}
+					],
+					"type": "dialog:button"
+				}
+			],
+			"saveTask": true,
+			"text": "All item option in this dialog. You can enable time expire auto confirm on timer option. I not recommended more than one radio button option in one dialog, it may create bug."
+		}, {
+			"id": "dialog:normal_item_checkbox",
+			"option": [{
+					"data": {
+						"close": false,
+						"column": 4,
+						"default": [0],
+						"stacks": {
+							"0": {
+								"count": 1,
+								"meta": 0,
+								"name": "minecraft:diamond"
+							},
+							"1": {
+								"count": 1,
+								"meta": 0,
+								"name": "minecraft:diamond"
+							},
+							"2": {
+								"count": 4,
+								"meta": 0,
+								"name": "minecraft:diamond"
+							},
+							"3": {
+								"count": 5,
+								"meta": 0,
+								"name": "minecraft:diamond"
+							},
+							"4": {
+								"count": 1,
+								"meta": 0,
+								"name": "minecraft:diamond"
+							},
+							"5": {
+								"count": 4,
+								"meta": 0,
+								"name": "minecraft:diamond"
+							}
+						}
+					},
+					"tasks": [{
+							"clazz": "cat.jiu.dialog.test.TestDialog$$Lambda$190/534113368",
+							"data": {}
+						}, {
+							"clazz": "cat.jiu.dialog.test.TestDialog$$Lambda$191/871699614",
+							"data": {}
+						}
+					],
+					"type": "dialog:item_checkbox"
+				}
+			],
+			"saveTask": true,
+			"text": "I not recommended more than one radio button option in one dialog, it may create bug."
+		}, {
+			"id": "dialog:timer_item_checkbox",
+			"option": [{
+					"data": {
+						"auto": false,
+						"timer": {
+							"allTicks": 638,
+							"isSys": false,
+							"ticks": 638
+						},
+						"value": {
+							"close": false,
+							"column": 4,
+							"default": [0],
+							"stacks": {
+								"0": {
+									"count": 1,
+									"meta": 0,
+									"name": "minecraft:diamond"
+								},
+								"1": {
+									"count": 1,
+									"meta": 0,
+									"name": "minecraft:diamond"
+								},
+								"2": {
+									"count": 4,
+									"meta": 0,
+									"name": "minecraft:diamond"
+								},
+								"3": {
+									"count": 5,
+									"meta": 0,
+									"name": "minecraft:diamond"
+								},
+								"4": {
+									"count": 1,
+									"meta": 0,
+									"name": "minecraft:diamond"
+								},
+								"5": {
+									"count": 4,
+									"meta": 0,
+									"name": "minecraft:diamond"
+								}
+							}
+						}
+					},
+					"tasks": [{
+							"clazz": "cat.jiu.dialog.test.TestDialog$$Lambda$192/2052770919",
+							"data": {}
+						}, {
+							"clazz": "cat.jiu.dialog.test.TestDialog$$Lambda$193/109250290",
+							"data": {}
+						}
+					],
+					"type": "dialog:timer_item_checkbox"
+				}
+			],
+			"saveTask": true,
+			"text": "You can enable time expire auto confirm on timer option. I not recommended more than one radio button option in one dialog, it may create bug."
+		}, {
+			"id": "dialog:normal_item_radio",
+			"option": [{
+					"data": {
+						"close": false,
+						"column": 4,
+						"default": 0,
+						"stacks": {
+							"0": {
+								"count": 1,
+								"meta": 0,
+								"name": "minecraft:diamond"
+							},
+							"1": {
+								"count": 1,
+								"meta": 0,
+								"name": "minecraft:diamond"
+							},
+							"2": {
+								"count": 4,
+								"meta": 0,
+								"name": "minecraft:diamond"
+							},
+							"3": {
+								"count": 5,
+								"meta": 0,
+								"name": "minecraft:diamond"
+							},
+							"4": {
+								"count": 1,
+								"meta": 0,
+								"name": "minecraft:diamond"
+							},
+							"5": {
+								"count": 4,
+								"meta": 0,
+								"name": "minecraft:diamond"
+							}
+						}
+					},
+					"tasks": [{
+							"clazz": "cat.jiu.dialog.test.TestDialog$$Lambda$194/897579012",
+							"data": {}
+						}
+					],
+					"type": "dialog:item_radio"
+				}
+			],
+			"saveTask": true,
+			"text": "I not recommended more than one radio button option in one dialog, it may create bug."
+		}, {
+			"id": "dialog:timer_item_radio",
+			"option": [{
+					"data": {
+						"auto": false,
+						"timer": {
+							"allTicks": 638,
+							"isSys": false,
+							"ticks": 638
+						},
+						"value": {
+							"close": false,
+							"column": 4,
+							"default": 0,
+							"stacks": {
+								"0": {
+									"count": 1,
+									"meta": 0,
+									"name": "minecraft:diamond"
+								},
+								"1": {
+									"count": 1,
+									"meta": 0,
+									"name": "minecraft:diamond"
+								},
+								"2": {
+									"count": 4,
+									"meta": 0,
+									"name": "minecraft:diamond"
+								},
+								"3": {
+									"count": 5,
+									"meta": 0,
+									"name": "minecraft:diamond"
+								},
+								"4": {
+									"count": 1,
+									"meta": 0,
+									"name": "minecraft:diamond"
+								},
+								"5": {
+									"count": 4,
+									"meta": 0,
+									"name": "minecraft:diamond"
+								}
+							}
+						}
+					},
+					"tasks": [{
+							"clazz": "cat.jiu.dialog.test.TestDialog$$Lambda$195/121639537",
+							"data": {}
+						}
+					],
+					"type": "dialog:timer_item_radio"
+				}
+			],
+			"saveTask": true,
+			"text": "You can enable time expire auto confirm on timer option. I not recommended more than one radio button option in one dialog, it may create bug."
+		}, {
+			"id": "dialog:timer",
+			"option": [{
+					"data": {
+						"close": false,
+						"text": {
+							"text": "Timer checkbox."
+						}
+					},
+					"tasks": [{
+							"clazz": "cat.jiu.dialog.utils.ButtonDisplayDialog",
+							"data": {
+								"next": "dialog:timer_checkbox"
+							}
+						}
+					],
+					"type": "dialog:button"
+				}, {
+					"data": {
+						"close": false,
+						"text": {
+							"text": "Timer item checkbox."
+						}
+					},
+					"tasks": [{
+							"clazz": "cat.jiu.dialog.utils.ButtonDisplayDialog",
+							"data": {
+								"next": "dialog:timer_item_checkbox"
+							}
+						}
+					],
+					"type": "dialog:button"
+				}, {
+					"data": {
+						"close": false,
+						"text": {
+							"text": "Timer radio button."
+						}
+					},
+					"tasks": [{
+							"clazz": "cat.jiu.dialog.utils.ButtonDisplayDialog",
+							"data": {
+								"next": "dialog:timer_radio"
+							}
+						}
+					],
+					"type": "dialog:button"
+				}, {
+					"data": {
+						"close": false,
+						"text": {
+							"text": "Timer item radio button."
+						}
+					},
+					"tasks": [{
+							"clazz": "cat.jiu.dialog.utils.ButtonDisplayDialog",
+							"data": {
+								"next": "dialog:timer_item_radio"
+							}
+						}
+					],
+					"type": "dialog:button"
+				}, {
+					"data": {
+						"close": false,
+						"text": {
+							"isCenter": true,
+							"text": "Back."
+						}
+					},
+					"tasks": [{
+							"clazz": "cat.jiu.dialog.utils.ButtonDisplayDialog",
+							"data": {
+								"next": "dialog:test_main"
+							}
+						}
+					],
+					"type": "dialog:button"
+				}
+			],
+			"saveTask": true,
+			"text": "All timer option in this dialog. You can enable time expire auto confirm on timer option. I not recommended more than one radio button option in one dialog, it may create bug."
+		}, {
+			"id": "dialog:timer_checkbox",
+			"option": [{
+					"data": {
+						"auto": false,
+						"timer": {
+							"allTicks": 618,
+							"isSys": false,
+							"ticks": 618
+						},
+						"value": {
+							"close": false,
+							"column": 4,
+							"default": [0, 3],
+							"options": [{
+									"text": "a check option"
+								}, {
+									"text": "a check option"
+								}, {
+									"text": "a check option"
+								}, {
+									"text": "a check option"
+								}, {
+									"text": "a check option"
+								}
+							]
+						}
+					},
+					"tasks": [{
+							"clazz": "cat.jiu.dialog.test.TestDialog$$Lambda$196/893317696",
+							"data": {}
+						}, {
+							"clazz": "cat.jiu.dialog.test.TestDialog$$Lambda$197/2105930796",
+							"data": {}
+						}
+					],
+					"type": "dialog:timer_checkbox"
+				}
+			],
+			"saveTask": true,
+			"text": "You can enable time expire auto confirm on timer option. I not recommended more than one radio button option in one dialog, it may create bug."
+		}, {
+			"id": "dialog:timer_radio",
+			"option": [{
+					"data": {
+						"auto": false,
+						"timer": {
+							"allTicks": 618,
+							"isSys": false,
+							"ticks": 618
+						},
+						"value": {
+							"close": false,
+							"column": 4,
+							"options": [{
+									"text": "a check option"
+								}, {
+									"text": "a check option"
+								}, {
+									"text": "a check option"
+								}, {
+									"text": "a check option"
+								}, {
+									"text": "a check option"
+								}
+							],
+							"select": 3
+						}
+					},
+					"tasks": [{
+							"clazz": "cat.jiu.dialog.test.TestDialog$$Lambda$198/1500157818",
+							"data": {}
+						}
+					],
+					"type": "dialog:timer_radio_btn"
+				}
+			],
+			"saveTask": true,
+			"text": "You can enable time expire auto confirm on timer option. I not recommended more than one radio button option in one dialog, it may create bug."
+		}
+	],
+	"subscriber": true
+}

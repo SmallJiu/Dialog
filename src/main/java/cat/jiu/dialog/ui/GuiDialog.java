@@ -7,20 +7,22 @@ import java.util.List;
 
 import com.google.common.collect.Lists;
 
+import cat.jiu.core.api.element.IText;
 import cat.jiu.dialog.DialogAPI;
 import cat.jiu.dialog.ModMain;
-import cat.jiu.dialog.api.DialogDimension;
-import cat.jiu.dialog.api.OptionDimension;
-import cat.jiu.dialog.element.option.DialogOptionDrawUnit;
+import cat.jiu.dialog.api.IDialogOption;
+import cat.jiu.dialog.element.Dialog;
+import cat.jiu.dialog.element.OptionDrawUnit;
 import cat.jiu.dialog.event.DialogEvent;
 import cat.jiu.dialog.event.DialogInputEvent;
-import cat.jiu.dialog.iface.IDialogOptionDataUnit;
-import cat.jiu.dialog.net.MsgDialogEvent;
+import cat.jiu.dialog.net.msg.MsgDialogEvent;
 import cat.jiu.dialog.utils.DialogConfig;
-
+import cat.jiu.dialog.utils.dimension.DialogDimension;
+import cat.jiu.dialog.utils.dimension.OptionDimension;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.Gui;
+import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.GlStateManager;
@@ -40,17 +42,44 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 @SideOnly(Side.CLIENT)
 @EventBusSubscriber(Side.CLIENT)
 public class GuiDialog extends GuiContainer {
-	protected final EntityPlayer player;
+	protected boolean isClose = false;;
+	public final EntityPlayer player;
 	protected final List<Unit> options = Lists.newArrayList();
-	protected final ContainerDialog contaniner;
-	protected final DialogDimension dim = new DialogDimension(this.getTextLength()+5, 0);
+	public final ContainerDialog contaniner;
+	public final DialogDimension dim = new DialogDimension(this.getTextLength()+5, 0);
+	protected GuiDialog parentDialog;
 	
-	public GuiDialog(EntityPlayer player) {
+	public GuiDialog(GuiScreen parent, EntityPlayer player) {
 		super(new ContainerDialog(player));
 		this.player = player;
 		this.contaniner = (ContainerDialog) super.inventorySlots;
 		this.xSize = this.getTextLength()+5;
+		
+		if(parent instanceof GuiScreen) {
+			this.parentDialog = (GuiDialog) parent;
+		}
+		
 		MinecraftForge.EVENT_BUS.register(this);
+	}
+	
+	public void setParentDialog(GuiDialog parent) {
+		this.parentDialog = parent;
+	}
+	public GuiDialog getParentDialog() {
+		return parentDialog;
+	}
+	public ResourceLocation getParentDialogID() {
+		if(this.parentDialog!=null && this.parentDialog.getDialog()!=null) {
+			return this.parentDialog.getDialog().getID();
+		}
+		return null;
+	}
+	
+	public Dialog getDialog() {
+		if(this.contaniner.getDialog() != null) {
+			return this.contaniner.getDialog().clone();
+		}
+		return null;
 	}
 	
 	// option function implement
@@ -59,7 +88,7 @@ public class GuiDialog extends GuiContainer {
 	protected void keyTyped(char typedChar, int keyCode) throws IOException {
 		boolean flag = false;
 		for(int i = 0; i < this.options.size(); i++) {
-			flag = this.options.get(i).drawUnit.keyTyped(typedChar, keyCode);
+			flag = this.options.get(i).drawUnit.keyTyped(this, typedChar, keyCode);
 			if(flag) break;
 		}
 		if(!flag) super.keyTyped(typedChar, keyCode);
@@ -67,7 +96,7 @@ public class GuiDialog extends GuiContainer {
 	@SubscribeEvent
 	public void receiveKeyTyped(DialogInputEvent.KeyboardInput event) {
 		if(event.optionID < this.options.size() && event.optionID >= 0) {
-			this.options.get(event.optionID).drawUnit.keyTyped(event.typedChar, event.keyCode);
+			this.options.get(event.optionID).drawUnit.keyTyped(this, event.typedChar, event.keyCode);
 		}
 	}
 	
@@ -76,7 +105,7 @@ public class GuiDialog extends GuiContainer {
 		super.mouseClicked(mouseX, mouseY, mouseButton);
 		if(this.contaniner.getDialog()!=null && this.init) {
 			for(int i = 0; i < this.options.size(); i++) {
-				this.options.get(i).drawUnit.mouseClicked(mouseX, mouseY, mouseButton, this.options.get(i).dimension);
+				this.options.get(i).drawUnit.mouseClicked(this, mouseX, mouseY, mouseButton, this.options.get(i).dimension);
 			}
 		}
 	}
@@ -96,7 +125,7 @@ public class GuiDialog extends GuiContainer {
 	protected void mouseClickMove(int mouseX, int mouseY, int clickedMouseButton, long timeSinceLastClick) {
 		super.mouseClickMove(mouseX, mouseY, clickedMouseButton, timeSinceLastClick);
 		for(int i = 0; i < this.options.size(); i++) {
-			this.options.get(i).drawUnit.mouseClickMove(mouseX, mouseY, clickedMouseButton, timeSinceLastClick);
+			this.options.get(i).drawUnit.mouseClickMove(this, mouseX, mouseY, clickedMouseButton, timeSinceLastClick);
 		}
 	}
 	@SubscribeEvent
@@ -111,7 +140,7 @@ public class GuiDialog extends GuiContainer {
 	public void handleInput() throws IOException {
 		super.handleInput();
 		for(int i = 0; i < this.options.size(); i++) {
-			this.options.get(i).drawUnit.handleInput(this.fontRenderer);
+			this.options.get(i).drawUnit.handleInput(this, this.fontRenderer);
 		}
 	}
 	
@@ -119,7 +148,7 @@ public class GuiDialog extends GuiContainer {
 	public void handleMouseInput() throws IOException {
 		super.handleMouseInput();
 		for(int i = 0; i < this.options.size(); i++) {
-			this.options.get(i).drawUnit.handleMouseInput(this.fontRenderer);
+			this.options.get(i).drawUnit.handleMouseInput(this, this.fontRenderer);
 		}
 	}
 	
@@ -127,7 +156,7 @@ public class GuiDialog extends GuiContainer {
 	public void handleKeyboardInput() throws IOException {
 		super.handleKeyboardInput();
 		for(int i = 0; i < this.options.size(); i++) {
-			this.options.get(i).drawUnit.handleKeyboardInput(this.fontRenderer);
+			this.options.get(i).drawUnit.handleKeyboardInput(this, this.fontRenderer);
 		}
 	}
 	
@@ -135,6 +164,14 @@ public class GuiDialog extends GuiContainer {
 	
 	private boolean init = false;
 	private List<String> title;
+	
+	public void setTitle(IText tile) {
+		if(tile.isVanillaWrap()) {
+			this.title = this.fontRenderer.listFormattedStringToWidth(tile.format(), this.getTextLength()+6);
+		}else {
+			this.title = splitString(tile.format(), this.getTextLength()+6);
+		}
+	}
 	
 	protected int getTextLength() {
 		return DialogConfig.Dialog_Gui_Width;
@@ -170,11 +207,7 @@ public class GuiDialog extends GuiContainer {
         	y = sr.getScaledHeight() - height;
         }
         
-        GlStateManager.pushAttrib();
-        GlStateManager.pushMatrix();
         this.drawBackground(x-3 - 5 - 2, y - 3, this.getTextLength()+5, height);
-        GlStateManager.popMatrix();
-        GlStateManager.popAttrib();
 		
 		for(int i = 0; i < this.title.size(); i++) {
 			if(this.contaniner.getDialog().getTitle().isCenter()) {
@@ -184,8 +217,6 @@ public class GuiDialog extends GuiContainer {
 			}
 			y += 9;
 		}
-		
-//		super.drawSlot(new Slot(mc.player.inventory, 0, 5, sr.getScaledHeight() - 21));
 		
 		y+=3;
 		for(int i = 0; i < this.options.size(); i++) {
@@ -220,95 +251,82 @@ public class GuiDialog extends GuiContainer {
 	}
 	
 	protected void drawBackground(int startX, int startY, int width, int height) {
+		GlStateManager.pushMatrix();
+        GlStateManager.pushAttrib();
+        GlStateManager.enableAlpha();
+        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+        
 		this.dim.width = width;
 		this.dim.height = height;
 		
     	int endX = startX + width + 12 - 3;
     	int endY = startY + height - 4;
+    	int u = DialogConfig.Enable_Transparent_Background ? 22 : 32;
     	
         this.mc.getTextureManager().bindTexture(GuiHandler.dialog_texture);
-        
-//      for(int i = startX + 4; i < endX + 1; i++) {
-//			for(int j = startY + 4; j < endY + 1; j++) {
-//				this.drawTexturedModalRect(i, j, 26, 4, 1, 1);
-//			}
-//		}
         // 中间大背景
-        Gui.drawScaledCustomSizeModalRect(startX + 4, startY + 4, 26, 4, 2, 2, (endX + 1) - (startX + 4), (endY + 1) - (startY + 4), 256, 256);
+        Gui.drawScaledCustomSizeModalRect(startX + 4, startY + 4, u+3, 4, 2, 2, (endX + 1) - (startX + 4), (endY + 1) - (startY + 4), 256, 256);
         
-//     	for(int i = startX + 4; i < endX + 1; i++) {
-//	        this.drawTexturedModalRect(i, startY + 3, 26, 4, 1, 1);
-//		}
         // 中间大背景顶部与边边中间的一小条
-        Gui.drawScaledCustomSizeModalRect(startX + 4, startY + 3, 26, 4, 2, 2, endX - (startX + 3), 1, 256, 256);
+        Gui.drawScaledCustomSizeModalRect(startX + 4, startY + 3, u+3, 4, 2, 2, endX - (startX + 3), 1, 256, 256);
         
-//      for(int i = startY + 4; i < endY + 1; i++) {
-//	        this.drawTexturedModalRect(startX + 3, i, 26, 4, 1, 1);
-//		}
         // 中间大背景左边与边边中间的一小条
-        Gui.drawScaledCustomSizeModalRect(startX + 3, startY + 4, 26, 4, 2, 2, 1, (endY + 1) - (startY + 4), 256, 256);
+        Gui.drawScaledCustomSizeModalRect(startX + 3, startY + 4, u+3, 4, 2, 2, 1, (endY + 1) - (startY + 4), 256, 256);
         
-//      for(int i = startX + 4; i < endX + 1; i++) {
-//	        this.drawTexturedModalRect(i, endY + 1, 26, 4, 1, 1);
-//		}
         // 中间大背景底部与边边中间的一小条
-        Gui.drawScaledCustomSizeModalRect(startX + 4, endY + 1, 26, 4, 2, 2, (endX + 1) - (startX + 4), 1, 256, 256);
+        Gui.drawScaledCustomSizeModalRect(startX + 4, endY + 1, u+3, 4, 2, 2, (endX + 1) - (startX + 4), 1, 256, 256);
         
-//      for(int i = startY + 4; i < endY + 1; i++) {
-//	        this.drawTexturedModalRect(endX+1, i, 26, 4, 1, 1);
-//		}
         // 中间大背景右边与边边中间的一小条
-        Gui.drawScaledCustomSizeModalRect(endX+1, startY + 4, 26, 4, 2, 2, 1, (endY + 1) - (startY + 4), 256, 256);
+        Gui.drawScaledCustomSizeModalRect(endX+1, startY + 4, u+3, 4, 2, 2, 1, (endY + 1) - (startY + 4), 256, 256);
         
-        
-//      for(int i = startX + 4; i < endX+1; i++) {
-//        	this.drawTexturedModalRect(i, startY, 24, 0, 1, 3);
-//		}
         // 中间大背景顶部的边
-        Gui.drawScaledCustomSizeModalRect(startX + 4, startY, 24, 0, 1, 3, (endX + 1) - (startX + 4), 3, 256, 256);
+        Gui.drawScaledCustomSizeModalRect(startX + 4, startY, u+2, 0, 1, 3, (endX + 1) - (startX + 4), 3, 256, 256);
         
-//      for(int i = startX + 4; i < endX+1; i++) {
-//        	this.drawTexturedModalRect(i, endY+2, 25, 7, 1, 3);
-//		}
         // 中间大背景底部的边
-        Gui.drawScaledCustomSizeModalRect(startX + 4, endY + 2, 25, 7, 1, 3, (endX + 1) - (startX + 4), 3, 256, 256);
+        Gui.drawScaledCustomSizeModalRect(startX + 4, endY + 2, u+3, 7, 1, 3, (endX + 1) - (startX + 4), 3, 256, 256);
         
-//      for(int i = startY + 4; i < endY+1; i++) {
-//        	this.drawTexturedModalRect(startX, i, 22, 2, 3, 1);
-//		}
         // 中间大背景左边的边
-        Gui.drawScaledCustomSizeModalRect(startX, startY + 4, 22, 2, 3, 1, 3, (endY + 1) - (startY + 4), 256, 256);
+        Gui.drawScaledCustomSizeModalRect(startX, startY + 4, u, 2, 3, 1, 3, (endY + 1) - (startY + 4), 256, 256);
         
-//      for(int i = startY + 4; i < endY+1; i++) {
-//        	this.drawTexturedModalRect(endX+2, i, 29, 3, 3, 1);
-//		}
         // 中间大背景右边的边
-        Gui.drawScaledCustomSizeModalRect(endX+2, startY + 4, 29, 3, 3, 1, 3, (endY + 1) - (startY + 4), 256, 256);
+        Gui.drawScaledCustomSizeModalRect(endX+2, startY + 4, u+7, 3, 3, 1, 3, (endY + 1) - (startY + 4), 256, 256);
         
         // 中间大背景左上的拐弯
-        this.drawTexturedModalRect(startX, startY, 22, 0, 4, 4);
+        this.drawTexturedModalRect(startX, startY, u, 0, 4, 4);
         // 中间大背景右上的拐弯
-        this.drawTexturedModalRect(endX+1, startY, 28, 0, 4, 4);
+        this.drawTexturedModalRect(endX+1, startY, u+6, 0, 4, 4);
         
+        // 中间大背景左下的拐弯
+        this.drawTexturedModalRect(startX, endY+1, u, 6, 4, 4);
         // 中间大背景右下的拐弯
-        this.drawTexturedModalRect(startX, endY+1, 22, 6, 4, 4);
-        // 中间大背景右下的拐弯
-        this.drawTexturedModalRect(endX+1, endY+1, 28, 6, 4, 4);
+        this.drawTexturedModalRect(endX+1, endY+1, u+6, 6, 4, 4);
+        
+        GlStateManager.popAttrib();
+        GlStateManager.popMatrix();
+        GlStateManager.disableAlpha();
+        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+	}
+	
+	private void findTopParentDialog() {
+		if(this.parentDialog != null
+		&& this.parentDialog.getDialog().getID().equals(this.getDialog().getID())) {
+			this.parentDialog = this.parentDialog.parentDialog;
+			this.findTopParentDialog();
+		}
 	}
 	
 	@Override
 	protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) {
 		if(this.init) {
 			this.drawDialog(mouseX, mouseY);
+		}else {
+			this.loadingBar();
 		}
 		
 		if(this.contaniner.getDialog()!=null && !this.init) {
-			String titleStr = this.contaniner.getDialog().getTitle().format();
-			if(this.contaniner.getDialog().getTitle().isVanillaWrap()) {
-				this.title = Lists.newArrayList(this.fontRenderer.listFormattedStringToWidth(titleStr, this.getTextLength()+6));
-			}else {
-				this.title = splitString(titleStr, this.getTextLength()+6);
-			}
+			this.findTopParentDialog();
+			
+			this.setTitle(this.contaniner.getDialog().getTitle());
 			
 			ScaledResolution sr = new ScaledResolution(this.mc);
 			int centerX = sr.getScaledWidth() / 2 -1;
@@ -319,12 +337,13 @@ public class GuiDialog extends GuiContainer {
 	        ResourceLocation dialogID = this.contaniner.getDialog().getID();
 			
 			for(int optionID = 0; optionID < this.contaniner.getDialog().getOptions().size(); optionID++) {
-				IDialogOptionDataUnit data = this.contaniner.getDialog().getOptions().get(optionID);
-				DialogOptionDrawUnit draw = DialogAPI.getDrawUnit(data.getTypeID(), dialogID, optionID, data, this.dim);
+				IDialogOption data = this.contaniner.getDialog().getOptions().get(optionID);
+				OptionDrawUnit draw = DialogAPI.getDrawUnit(data.getTypeID(), dialogID, optionID, data, this.dim);
 				if(draw == null) continue;
 				
+				draw.init(this, this.fontRenderer);
 				this.options.add(new Unit(draw, new OptionDimension(x, y, this.getTextLength()-5, draw.getHeight(this.fontRenderer))));
-				
+	        	
 				y += draw.getHeight(this.fontRenderer);
 			}
 			
@@ -339,44 +358,40 @@ public class GuiDialog extends GuiContainer {
 	        this.dim.height = height;
 	        this.ySize = height;
 	        
-	        for(int i = 0; i < this.options.size(); i++) {
-	        	this.options.get(i).drawUnit.init(this, this.fontRenderer);
-	        }
-	        
 	        MinecraftForge.EVENT_BUS.post(new DialogEvent.Open(this.player, this.contaniner.getDialog().getID()));
-			ModMain.network.sendMessageToServer(new MsgDialogEvent(this.contaniner.getDialog().getID(), true));
+			ModMain.NETWORK.sendMessageToServer(new MsgDialogEvent(this.contaniner.getDialog().getID(), true));
 	        this.init = true;
 		}
-		
-		if(!this.init) {
-			this.drawLoadingBar();
-			if(!this.startLoading) {
-				this.startLoading = true;
-				new Thread(()->{
-					boolean reverseLoadingIndex = false;
-					int i = 0;
-					while(!this.init) {
-						try {
-							Thread.sleep(100);
-							i++;
-							if(this.loadingIndex >= 4) {
-								reverseLoadingIndex = true;
-							}else if(this.loadingIndex <= 0) {
-								reverseLoadingIndex = false;
-							}
-							if(reverseLoadingIndex) {
-								this.loadingIndex--;
-							}else {
-								this.loadingIndex++;
-							}
-							if(i>9) {
-								loadingTime++;
-								i=0;
-							}
-						}catch(Exception e) {}
-					}
-				}).start();
-			}
+	}
+	
+	protected void loadingBar() {
+		this.drawLoadingBar();
+		if(!this.startLoading) {
+			this.startLoading = true;
+			new Thread(()->{
+				boolean reverseLoadingIndex = false;
+				int i = 0;
+				while(!this.init) {
+					try {
+						Thread.sleep(100);
+						i++;
+						if(this.loadingIndex >= 4) {
+							reverseLoadingIndex = true;
+						}else if(this.loadingIndex <= 0) {
+							reverseLoadingIndex = false;
+						}
+						if(reverseLoadingIndex) {
+							this.loadingIndex--;
+						}else {
+							this.loadingIndex++;
+						}
+						if(i>9) {
+							loadingTime++;
+							i=0;
+						}
+					}catch(Exception e) {}
+				}
+			}).start();
 		}
 	}
 	
@@ -418,13 +433,19 @@ public class GuiDialog extends GuiContainer {
 	public void onGuiClosed() {
 		super.onGuiClosed();
 		MinecraftForge.EVENT_BUS.unregister(this);
+		this.isClose = true;
 		if(this.contaniner.getDialog()!=null) {
 			MinecraftForge.EVENT_BUS.post(new DialogEvent.Close(this.player, this.contaniner.getDialog().getID()));
-			ModMain.network.sendMessageToServer(new MsgDialogEvent(this.contaniner.getDialog().getID(), false));
+			ModMain.NETWORK.sendMessageToServer(new MsgDialogEvent(this.contaniner.getDialog().getID(), false));
 		}
+		this.options.forEach(unit -> unit.drawUnit.onClose(this));
 	}
 	
 	// public method
+	
+	public boolean isClose() {
+		return isClose;
+	}
 	
 	@Override
 	public void drawGradientRect(int left, int top, int right, int bottom, int startColor, int endColor) {
@@ -443,7 +464,7 @@ public class GuiDialog extends GuiContainer {
 	public void drawCenteredString(FontRenderer fr, String text, int x, int y, int color) {
 		fr.drawString(text, (float)(x - fr.getStringWidth(text) / 2), (float)y, color, false);
 	}
-	public void drawCenteredStringWithShadow(FontRenderer fr, String text, int x, int y, int color) {
+	public void drawCenteredStringWithShadow(FontRenderer fr, String text, float x, float y, int color) {
 		fr.drawString(text, (float)(x - fr.getStringWidth(text) / 2), (float)y, color, true);
 	}
 	
@@ -515,9 +536,9 @@ public class GuiDialog extends GuiContainer {
 	}
 	
 	class Unit {
-		public final DialogOptionDrawUnit drawUnit;
+		public final OptionDrawUnit drawUnit;
 		public final OptionDimension dimension;
-		public Unit(DialogOptionDrawUnit option, OptionDimension dimension) {
+		public Unit(OptionDrawUnit option, OptionDimension dimension) {
 			this.drawUnit = option;
 			this.dimension = dimension;
 		}

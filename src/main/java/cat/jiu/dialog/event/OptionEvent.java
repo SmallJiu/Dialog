@@ -15,13 +15,14 @@ public class OptionEvent extends Event {
 	/**
 	 * 对话框的ID
 	 */
-	public final ResourceLocation dialogID;
+	public final ResourceLocation parent, dialogID;
 	/**
 	 * 选项的ID
 	 */
 	public final int optionID;
-	public OptionEvent(EntityPlayer player, ResourceLocation dialogID, int optionIndex) {
+	public OptionEvent(EntityPlayer player, ResourceLocation parent, ResourceLocation dialogID, int optionIndex) {
 		this.player = player;
+		this.parent = parent;
 		this.dialogID = dialogID;
 		this.optionID = optionIndex;
 	}
@@ -37,8 +38,8 @@ public class OptionEvent extends Event {
 		 * 点击时使用的鼠标按键ID
 		 */
 		public final int mouseButton;
-		public ButtonClick(EntityPlayer player, ResourceLocation dialogID, int index, int mouseButton) {
-			super(player, dialogID, index);
+		public ButtonClick(EntityPlayer player, ResourceLocation parent, ResourceLocation dialogID, int index, int mouseButton) {
+			super(player, parent, dialogID, index);
 			this.mouseButton = mouseButton;
 		}
 	}
@@ -48,21 +49,19 @@ public class OptionEvent extends Event {
 	 * 注意: 事件会在服务端与客户端各触发一次
 	 * @author small_jiu
 	 */
-	@Cancelable
 	public static class TextConfirm extends OptionEvent {
 		/**
 		 * 文本框的文本
 		 */
-		protected String text;
-		public TextConfirm(EntityPlayer player, ResourceLocation dialogID, int index, String text) {
-			super(player, dialogID, index);
+		public final String text;
+		public TextConfirm(EntityPlayer player, ResourceLocation parent, ResourceLocation dialogID, int index, String text) {
+			super(player, parent, dialogID, index);
 			this.text = text;
 		}
-		public String getText() {
-			return text;
-		}
-		public void setText(String text) {
-			this.text = text;
-		}
+	}
+	
+	public static class Registry extends Event {
+		public static class Pre extends Registry {}
+		public static class Post extends Registry {}
 	}
 }

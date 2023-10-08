@@ -1,6 +1,7 @@
 package cat.jiu.dialog.ui;
 
 import cat.jiu.dialog.ModMain;
+import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
@@ -26,7 +27,7 @@ public class GuiHandler implements IGuiHandler {
 	@Override
 	public Object getClientGuiElement(int ID, EntityPlayer player, World world, int x, int y, int z) {
 		if(ID == DIALOG) {
-			return new GuiDialog(player);
+			return new GuiDialog(Minecraft.getMinecraft().currentScreen, player);
 		}
 		return null;
 	}

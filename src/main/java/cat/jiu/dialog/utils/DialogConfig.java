@@ -21,17 +21,27 @@ public class DialogConfig {
 	 * @see cat.jiu.dialog.iface.IDialogText#isVanillaWrap()
 	 */
 	@Config.LangKey("dialog.config.vanilla_wrap")
-	@Config.Comment("use vanilla to wrap text if true, else will use Single char wrap.")
+	@Config.Comment({
+			"use vanilla to wrap text if true",
+			"else will use Single char wrap."
+	})
 	public static boolean Enable_Vanilla_Wrap_Text = true;
 
 	@Config.LangKey("dialog.config.test_dialog")
 	@Config.RequiresWorldRestart
 	@Config.Comment("enable test dialog, need break 'minecraft:redstone_block' to display")
 	public static boolean Enable_Test_Dialog = false;
+	
+	@Config.LangKey("dialog.config.transparent_bg")
+	@Config.Comment({
+			"use transparent background if true",
+			"if is transparent background, chat message not empty will change to not transparent, it may is bug."
+	})
+	public static boolean Enable_Transparent_Background = false;
 
 	@Config.LangKey("dialog.config.dialog_width")
 	@Config.Comment("the dialog gui widht")
-	public static int Dialog_Gui_Width = 256;
+	public static int Dialog_Gui_Width = 300;
 	
 	@SubscribeEvent
 	public static void onConfigChanged(ConfigChangedEvent.OnConfigChangedEvent event) {

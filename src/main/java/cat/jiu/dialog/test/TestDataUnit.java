@@ -2,17 +2,20 @@ package cat.jiu.dialog.test;
 
 import com.google.gson.JsonObject;
 
-import cat.jiu.dialog.element.DialogText;
-import cat.jiu.dialog.iface.IDialogOptionDataUnit;
-import cat.jiu.dialog.iface.IDialogText;
-
+import cat.jiu.core.api.element.IText;
+import cat.jiu.core.util.element.Text;
+import cat.jiu.dialog.api.IDialogOption;
+import cat.jiu.dialog.element.OptionDrawUnit;
+import cat.jiu.dialog.utils.dimension.DialogDimension;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class TestDataUnit implements IDialogOptionDataUnit {
+public class TestDataUnit implements IDialogOption {
 	@Override
-	public IDialogText getOptionText() {
-		return new DialogText(false, "dialog.text.custom_option");
+	public IText getOptionText() {
+		return new Text("dialog.text.custom_option").setCenter(false);
 	}
 	
 	protected static final NBTTagCompound nbt = new NBTTagCompound();
@@ -41,5 +44,15 @@ public class TestDataUnit implements IDialogOptionDataUnit {
 	@Override
 	public boolean canCloseDialog() {
 		return false;
+	}
+	@Override
+	public TestDataUnit copy() {
+		return new TestDataUnit();
+	}
+
+	@SideOnly(Side.CLIENT)
+	@Override
+	public OptionDrawUnit getDrawUnit(ResourceLocation dialogID, int optionID, IDialogOption option, DialogDimension dialogDimension) {
+		return new TestDrawUnit(dialogID, option, optionID, dialogDimension);
 	}
 }

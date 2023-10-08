@@ -1,7 +1,9 @@
 package cat.jiu.dialog.net;
 
 import cat.jiu.dialog.ModMain;
-
+import cat.jiu.dialog.api.IBaseMessage;
+import cat.jiu.dialog.net.msg.*;
+import cat.jiu.dialog.net.msg.option.*;
 import net.minecraft.entity.player.EntityPlayerMP;
 
 import net.minecraftforge.fml.common.network.NetworkRegistry;
@@ -10,20 +12,41 @@ import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import net.minecraftforge.fml.relauncher.Side;
 
 public class DialogNetworkHandler {
-	private SimpleNetworkWrapper channel;
+	private static SimpleNetworkWrapper channel;
 	private static int ID = 0;
 	private static int nextID() {
 		return ID++;
 	}
 	
 	public DialogNetworkHandler() {
-		this.channel = NetworkRegistry.INSTANCE.newSimpleChannel(ModMain.MODID);
-		
-		this.channel.registerMessage(MsgDialog::handler, MsgDialog.class, nextID(), Side.SERVER);
-		this.channel.registerMessage(MsgDialog::handler, MsgDialog.class, nextID(), Side.CLIENT);
-		this.channel.registerMessage(MsgOptionEvent::handler, MsgOptionEvent.class, nextID(), Side.SERVER);
-		this.channel.registerMessage(MsgDialogEvent::handler, MsgDialogEvent.class, nextID(), Side.SERVER);
-		
+		if(channel==null) {
+			ID=0;
+			channel = NetworkRegistry.INSTANCE.newSimpleChannel(ModMain.MODID);
+			this.register(MsgDialog.class, Side.SERVER);
+			this.register(MsgDialog.class, Side.CLIENT);
+			this.register(MsgDialogEvent.class, Side.SERVER);
+			
+			this.register(MsgButtonClick.class, Side.SERVER);
+			this.register(MsgTextConfirm.class, Side.SERVER);
+			
+			this.register(MsgCheckboxConfirm.class, Side.SERVER);
+			this.register(MsgCheckboxCheck.class, Side.SERVER);
+			
+			this.register(MsgRadioButtom.class, Side.SERVER);
+			
+			this.register(MsgItemRadioButtonChoose.class, Side.SERVER);
+			
+			this.register(MsgItemCheckboxConfirm.class, Side.SERVER);
+			this.register(MsgItemCheckboxSelect.class, Side.SERVER);
+			
+			this.register(MsgMultiTitle.Change.class, Side.SERVER);
+			this.register(MsgMultiTitle.Close.class, Side.SERVER);
+			this.register(MsgMultiTitle.BackParent.class, Side.SERVER);
+		}
+	}
+	
+	private <T extends IBaseMessage> void register(Class<T> clazz, Side sendTo) {
+		channel.registerMessage(T::handler, clazz, nextID(), sendTo);
 	}
 	
 	/** server to client */

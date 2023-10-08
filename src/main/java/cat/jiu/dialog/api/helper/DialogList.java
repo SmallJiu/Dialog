@@ -1,118 +1,247 @@
 package cat.jiu.dialog.api.helper;
 
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map.Entry;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
-import cat.jiu.dialog.event.OptionEvent;
-import cat.jiu.dialog.iface.*;
-
+import cat.jiu.dialog.DialogAPI;
+import cat.jiu.dialog.api.IOptionTask;
+import cat.jiu.dialog.api.helper.DialogList;
+import cat.jiu.dialog.api.helper.DialogOperation;
+import cat.jiu.dialog.api.task.*;
+import cat.jiu.dialog.event.*;
+import crafttweaker.annotations.ZenRegister;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.ResourceLocation;
+
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import stanhebben.zenscript.annotations.ZenClass;
+import stanhebben.zenscript.annotations.ZenMethod;
 
-/**
- * 对话框的列表，可以自动订阅事件并处理<p>
- * 注意：如果你创建对象时是在static时创建的，那你可能需要使用类似于Class.forName的方法初始化该类
- * @author small_jiu
- */
+@SuppressWarnings("all")
+@ZenRegister
+@ZenClass("dialog.api.List")
 @EventBusSubscriber
 public class DialogList {
-	protected final boolean subscriber;
+	public final boolean subscriber;
 	protected final LinkedHashMap<ResourceLocation, DialogOperation> dialogs = new LinkedHashMap<>();
-	/**
-	 * @param autoSubscriberEvent 是否自动处理对话框选项的点击事件
-	 */
+	
 	public DialogList(boolean autoSubscriberEvent) {
 		if(autoSubscriberEvent) {
 			MinecraftForge.EVENT_BUS.register(this);
 		}
 		this.subscriber = autoSubscriberEvent;
 	}
-	/**
-	 * 是否有对应ID的对话框
-	 * @param id 对话框的ID
-	 * @return 
-	 */
+	
 	public boolean hasDialogOperation(ResourceLocation id) {
 		return this.dialogs.containsKey(id);
 	}
-	/**
-	 * 获取对应ID的对话框
-	 * @param id 对话框ID
-	 * @return 对应的对话框
-	 */
+	@ZenMethod("hasDialog")
+	public boolean hasDialogOperation(String id) {
+		return this.dialogs.containsKey(new ResourceLocation(id));
+	}
+	
 	public DialogOperation getDialogOperation(ResourceLocation id) {
 		return this.dialogs.get(id);
 	}
-	/**
-	 * 添加一个对话框到列表
-	 * @param id 
-	 * @param dialog
-	 * @return
-	 */
-	public DialogList addDialogOperation(ResourceLocation id, DialogOperation dialog) {
-		dialog.getDialog().setID(id);
-		this.dialogs.put(id, dialog);
-		return this;
-	}
-	/**
-	 * 处理一个对话框按钮选项的点击事件
-	 * @param player Player
-	 * @param dialog 对话框ID
-	 * @param taskid 选项ID
-	 * @param mouseButton 点击时使用的按键
-	 */
-	public void execute(EntityPlayer player, ResourceLocation dialog, int taskid, int mouseButton) {
-		if(this.dialogs.containsKey(dialog)) {
-			DialogOperation operation = this.getDialogOperation(dialog);
-			if(operation.hasTask(taskid)) {
-				IOptionTask task = operation.getTask(taskid);
-				if(task instanceof IOptionButtonTask) {
-					((IOptionButtonTask) task).run(player, mouseButton);
-				}
-			}
-		}
+	@ZenMethod("getDialog")
+	public DialogOperation getDialogOperation(String id) {
+		return this.dialogs.get(new ResourceLocation(id));
 	}
 	
-	/**
-	 * 处理一个对话框文本框选项的点击事件
-	 * @param playerPlayer
-	 * @param text 文本框的文本
-	 * @param dialog 对话框ID
-	 * @param taskid 选项ID
-	 */
-	public void execute(EntityPlayer player, String text, ResourceLocation dialog, int taskid) {
-		if(this.dialogs.containsKey(dialog)) {
-			DialogOperation operation = this.getDialogOperation(dialog);
-			if(operation.hasTask(taskid)) {
-				IOptionTask task = operation.getTask(taskid);
-				if(task instanceof IOptionEditTextTask) {
-					((IOptionEditTextTask) task).run(player, text);
-				}
-			}
+	public DialogList addDialogOperation(ResourceLocation id, DialogOperation dialog) {
+		dialog.getOriginalDialog().setID(id);
+		this.dialogs.put(id, new DialogOperation(dialog));
+		return this;
+	}
+	@ZenMethod("addDialog")
+	public DialogList addDialogOperation(String id, DialogOperation dialog) {
+		return this.addDialogOperation(new ResourceLocation(id), dialog);
+	}
+	
+	public void display(EntityPlayer player, ResourceLocation id) {
+		if(this.hasDialogOperation(id)) {
+			DialogAPI.displayDialog(player, this.getDialogOperation(id).copyDialog());
 		}
+	}
+	@ZenMethod
+	public void display(EntityPlayer player, String id) {
+		this.display(player, new ResourceLocation(id));
 	}
 	
 	@SubscribeEvent(priority = EventPriority.LOWEST)
 	public void onDialogOptionButtonClick(OptionEvent.ButtonClick event) {
-		if(!event.isCanceled()) {
-			this.execute(event.player, event.dialogID, event.optionID, event.mouseButton);
+		if(this.dialogs.containsKey(event.dialogID)) {
+			DialogOperation operation = this.getDialogOperation(event.dialogID);
+			if(operation.hasTask(event.optionID)) {
+				List<IOptionTask> tasks = operation.getTask(event.optionID);
+				tasks.forEach(task->{
+					if(task instanceof IButtonTask) {
+						((IButtonTask) task).run(event.parent, event.dialogID, event.optionID, event.player, event.mouseButton);
+					}
+				});
+			}
 		}
 	}
 	
 	@SubscribeEvent(priority = EventPriority.LOWEST)
 	public void onDialogOptionEditTextConfirm(OptionEvent.TextConfirm event) {
-		if(!event.isCanceled()) {
-			this.execute(event.player, event.getText(), event.dialogID, event.optionID);
+		if(this.dialogs.containsKey(event.dialogID)) {
+			DialogOperation operation = this.getDialogOperation(event.dialogID);
+			if(operation.hasTask(event.optionID)) {
+				List<IOptionTask> tasks = operation.getTask(event.optionID);
+				tasks.forEach(task->{
+					if(task instanceof IEditTextTask) {
+						((IEditTextTask) task).run(event.parent, event.dialogID, event.optionID, event.player, event.text);
+					}
+				});
+			}
 		}
 	}
 	
+	@SubscribeEvent(priority = EventPriority.LOWEST)
+	public void onDialogOptionCheckboxConfirm(CheckboxEvent.Confirm event) {
+		if(this.dialogs.containsKey(event.dialogID)) {
+			DialogOperation operation = this.getDialogOperation(event.dialogID);
+			if(operation.hasTask(event.optionID)) {
+				List<IOptionTask> tasks = operation.getTask(event.optionID);
+				tasks.forEach(task->{
+					if(task instanceof ICheckboxConfirmTask) {
+						((ICheckboxConfirmTask) task).run(event.parent, event.dialogID, event.optionID, event.player, event.selects);
+					}
+				});
+			}
+		}
+	}
+	
+	@SubscribeEvent(priority = EventPriority.LOWEST)
+	public void onDialogOptionCheckboxCheck(CheckboxEvent.Check event) {
+		if(this.dialogs.containsKey(event.dialogID)) {
+			DialogOperation operation = this.getDialogOperation(event.dialogID);
+			if(operation.hasTask(event.optionID)) {
+				List<IOptionTask> tasks = operation.getTask(event.optionID);
+				tasks.forEach(task->{
+					if(task instanceof ICheckboxCheckTask) {
+						((ICheckboxCheckTask) task).run(event.parent, event.dialogID, event.optionID, event.player, event.selectIndex, event.optionString, event.isRemove);
+					}
+				});
+			}
+		}
+	}
+	
+	@SubscribeEvent(priority = EventPriority.LOWEST)
+	public void onDialogOptionRadioButtonEvent(RadioButtonEvent event) {
+		if(this.dialogs.containsKey(event.dialogID)) {
+			DialogOperation operation = this.getDialogOperation(event.dialogID);
+			if(operation.hasTask(event.optionID)) {
+				List<IOptionTask> tasks = operation.getTask(event.optionID);
+				tasks.forEach(task->{
+					if(task instanceof IRadioButtonTask) {
+						((IRadioButtonTask) task).run(event.parent, event.dialogID, event.optionID, event.player, event.selectIndex, event.optionString, event.confirm);
+					}
+				});
+			}
+		}
+	}
+	
+	@SubscribeEvent(priority = EventPriority.LOWEST)
+	public void onDialogOptionItemRadioButtonSelectEvent(ItemChooseEvent.Single event) {
+		if(this.dialogs.containsKey(event.dialogID)) {
+			DialogOperation operation = this.getDialogOperation(event.dialogID);
+			if(operation.hasTask(event.optionID)) {
+				List<IOptionTask> tasks = operation.getTask(event.optionID);
+				tasks.forEach(task->{
+					if(task instanceof IItemRadioButtonTask) {
+						((IItemRadioButtonTask) task).run(event.parent, event.dialogID, event.optionID, event.player, event.selectIndex, event.stack, event.confirm);
+					}
+				});
+			}
+		}
+	}
+	
+	@SubscribeEvent(priority = EventPriority.LOWEST)
+	public void onDialogOptionItemCheckboxConfirm(ItemChooseEvent.Multi.Confirm event) {
+		if(this.dialogs.containsKey(event.dialogID)) {
+			DialogOperation operation = this.getDialogOperation(event.dialogID);
+			if(operation.hasTask(event.optionID)) {
+				List<IOptionTask> tasks = operation.getTask(event.optionID);
+				tasks.forEach(task->{
+					if(task instanceof IItemCheckboxConfirmTask) {
+						((IItemCheckboxConfirmTask) task).run(event.parent, event.dialogID, event.optionID, event.player, event.selects);
+					}
+				});
+			}
+		}
+	}
+	
+	@SubscribeEvent(priority = EventPriority.LOWEST)
+	public void onDialogOptionItemCheckboxCheck(ItemChooseEvent.Multi.Select event) {
+		if(this.dialogs.containsKey(event.dialogID)) {
+			DialogOperation operation = this.getDialogOperation(event.dialogID);
+			if(operation.hasTask(event.optionID)) {
+				List<IOptionTask> tasks = operation.getTask(event.optionID);
+				tasks.forEach(task->{
+					if(task instanceof IItemCheckboxCheckTask) {
+						((IItemCheckboxCheckTask) task).run(event.parent, event.dialogID, event.optionID, event.player, event.selectIndex, event.stack, event.remove);
+					}
+				});
+			}
+		}
+	}
+	
+	@SubscribeEvent(priority = EventPriority.LOWEST)
+	public void onDialogMultiTitleChange(MultiTitleEvent.Change event) {
+		if(this.dialogs.containsKey(event.dialogID)) {
+			DialogOperation operation = this.getDialogOperation(event.dialogID);
+			if(operation.hasTask(event.optionID)) {
+				List<IOptionTask> tasks = operation.getTask(event.optionID);
+				tasks.forEach(task->{
+					if(task instanceof IMultiTitleChangeTask) {
+						((IMultiTitleChangeTask) task).run(event.parent, event.dialogID, event.optionID, event.player, event.newTitleIndex, event.oldTitlendex);
+					}
+				});
+			}
+		}
+	}
+	
+	@SubscribeEvent(priority = EventPriority.LOWEST)
+	public void onDialogMultiTitleClose(MultiTitleEvent.Close event) {
+		if(this.dialogs.containsKey(event.dialogID)) {
+			DialogOperation operation = this.getDialogOperation(event.dialogID);
+			if(operation.hasTask(event.optionID)) {
+				List<IOptionTask> tasks = operation.getTask(event.optionID);
+				tasks.forEach(task->{
+					if(task instanceof IMultiTitleCloseTask) {
+						((IMultiTitleCloseTask) task).run(event.parent, event.dialogID, event.optionID, event.player, event.newTitleIndex);
+					}
+				});
+			}
+		}
+	}
+	
+	@SubscribeEvent(priority = EventPriority.LOWEST)
+	public void onDialogMultiTitleToParent(MultiTitleEvent.BackParent event) {
+		if(this.dialogs.containsKey(event.dialogID)) {
+			DialogOperation operation = this.getDialogOperation(event.dialogID);
+			if(operation.hasTask(event.optionID)) {
+				List<IOptionTask> tasks = operation.getTask(event.optionID);
+				tasks.forEach(task->{
+					if(task instanceof IMultiTitleToParentTask) {
+						((IMultiTitleToParentTask) task).run(event.dialogID, event.optionID, event.player, event.newTitleIndex, event.parent);
+					}
+				});
+			}
+		}
+	}
+
+	
+	@ZenMethod
 	@Override
 	public String toString() {
 		return this.writeToJson(new JsonObject()).toString();
@@ -124,6 +253,7 @@ public class DialogList {
 	 * @param json
 	 * @return
 	 */
+	@ZenMethod
 	public JsonObject writeToJson(JsonObject json) {
 		if(json==null) json = new JsonObject();
 		json.addProperty("subscriber", this.subscriber);
@@ -138,6 +268,7 @@ public class DialogList {
 	/**
 	 * 从一个Json文件获取对话框列表
 	 */
+	@ZenMethod("fromJson")
 	public static DialogList get(JsonObject json) {
 		DialogList list = new DialogList(json.has("subscriber") ? json.get("subscriber").getAsBoolean() : false);
 		if(json.has("dialog") && json.get("dialog").isJsonArray()) {

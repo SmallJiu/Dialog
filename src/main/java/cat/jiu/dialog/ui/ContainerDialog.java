@@ -1,9 +1,8 @@
 package cat.jiu.dialog.ui;
 
+import cat.jiu.dialog.api.IDialogOption;
 import cat.jiu.dialog.element.Dialog;
-import cat.jiu.dialog.iface.IDialogOptionDataUnit;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.Slot;
@@ -32,8 +31,8 @@ public class ContainerDialog extends Container {
 	@SideOnly(Side.CLIENT)
 	public int getMaxTextWidth() {
 		int width = 0;
-		for(IDialogOptionDataUnit option : dialog.getOptions()) {
-			width = Math.max(width, Minecraft.getMinecraft().fontRenderer.getStringWidth(option.getOptionText().format()));
+		for(IDialogOption option : dialog.getOptions()) {
+			width = Math.max(width, option.getOptionText().getStringWidth());
 		}
 		return width;
 	}

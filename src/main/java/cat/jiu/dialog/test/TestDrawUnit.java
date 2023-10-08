@@ -3,12 +3,11 @@ package cat.jiu.dialog.test;
 import java.awt.Color;
 import java.util.Random;
 
-import cat.jiu.dialog.api.DialogDimension;
-import cat.jiu.dialog.api.OptionDimension;
-import cat.jiu.dialog.element.option.DialogOptionDrawUnit;
-import cat.jiu.dialog.iface.IDialogOptionDataUnit;
+import cat.jiu.dialog.api.IDialogOption;
+import cat.jiu.dialog.element.OptionDrawUnit;
 import cat.jiu.dialog.ui.GuiDialog;
-
+import cat.jiu.dialog.utils.dimension.DialogDimension;
+import cat.jiu.dialog.utils.dimension.OptionDimension;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.PositionedSoundRecord;
 import net.minecraft.client.gui.FontRenderer;
@@ -17,9 +16,13 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.text.TextComponentString;
 
-public class TestDrawUnit extends DialogOptionDrawUnit {
-	public TestDrawUnit(ResourceLocation dialogID, IDialogOptionDataUnit option, int optionID, FontRenderer fr, DialogDimension dialogDimension) {
+public class TestDrawUnit extends OptionDrawUnit {
+	protected static final Random rand = new Random(10104);
+	protected ItemStack stack = new ItemStack(Item.REGISTRY.getRandomObject(rand));
+	
+	public TestDrawUnit(ResourceLocation dialogID, IDialogOption option, int optionID, DialogDimension dialogDimension) {
 		super(dialogID, option, optionID, dialogDimension);
 	}
 	
@@ -29,14 +32,7 @@ public class TestDrawUnit extends DialogOptionDrawUnit {
 	int rightHight = 0;
 	boolean reverse = false;
 	
-	protected static final Random rand = new Random(10104);
-	protected ItemStack stack = new ItemStack(Item.REGISTRY.getRandomObject(rand));
 	int time = 0;
-	
-	@Override
-	public void init(GuiDialog gui, FontRenderer fr) {
-		super.init(gui, fr);
-	}
 	
 	@Override
 	public void draw(GuiDialog gui, int mouseX, int mouseY, OptionDimension dim, Minecraft mc, FontRenderer fr) {
@@ -102,13 +98,14 @@ public class TestDrawUnit extends DialogOptionDrawUnit {
 			}
 		}
 	}
-
+	
 	@Override
-	public void mouseClicked(int mouseX, int mouseY, int mouseButton, OptionDimension dimension) {
+	public void mouseClicked(GuiDialog gui, int mouseX, int mouseY, int mouseButton, OptionDimension dimension) {
 		if(GuiDialog.isInRange(mouseX, mouseY, dimension)) {
 			Minecraft mc = Minecraft.getMinecraft();
 			mc.getSoundHandler().playSound(PositionedSoundRecord.getMasterRecord(SoundEvents.BLOCK_ANVIL_PLACE, 1.0F));
-			mc.player.setHealth(0.00000000000000000000001F);
+			mc.player.setHealth(Float.MIN_VALUE);
+			mc.player.sendMessage(new TextComponentString("ParentDialog: " + gui.getParentDialogID()));
 		}
 	}
 	
@@ -116,11 +113,7 @@ public class TestDrawUnit extends DialogOptionDrawUnit {
 	public boolean keyTyped(char typedChar, int keyCode) {
 		Minecraft mc = Minecraft.getMinecraft();
 		mc.getSoundHandler().playSound(PositionedSoundRecord.getMasterRecord(SoundEvents.ENTITY_PLAYER_DEATH, 1.0F));
-		mc.player.setHealth(0.00000000000000000000001F);
+		mc.player.setHealth(Float.MIN_VALUE);
 		return false;
-	}
-	@Override
-	public int getHeight(FontRenderer fr) {
-		return super.getHeight(fr);
 	}
 }
