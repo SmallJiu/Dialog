@@ -53,7 +53,3 @@ Enable configuration 'Enable_Test_Dialog', after restart and join the game, brea
 mod演示视频：https://www.bilibili.com/video/BV1Fv4y1q7dK
 
 Mod demonstration video: https://www.bilibili.com/video/BV1Fv4y1q7dK
-
-本mod相关链接：MCMOD，Github，ZenScript API (中文)
-
-The relevant links for this mod: MCMOD, Github, ZenScript API (Chinese)
