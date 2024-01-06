@@ -49,11 +49,11 @@ public class OptionMultiTitle extends OptionButton implements IDialogOption {
 	};
 	
 	protected List<IText> titles;
-	protected boolean canBackPreviouDialog;
+	protected boolean canBackPreviousDialog;
 	
 	public OptionMultiTitle() {}
-	public OptionMultiTitle(boolean closeDialog, boolean canBackPreviouDialog, IText... titles) {
-		this(closeDialog, canBackPreviouDialog, Lists.newArrayList(titles));
+	public OptionMultiTitle(boolean closeDialog, boolean canBackPreviousDialog, IText... titles) {
+		this(closeDialog, canBackPreviousDialog, Lists.newArrayList(titles));
 	}
 	public OptionMultiTitle(boolean closeDialog, IText... titles) {
 		this(closeDialog, false, titles);
@@ -61,10 +61,10 @@ public class OptionMultiTitle extends OptionButton implements IDialogOption {
 	public OptionMultiTitle(boolean closeDialog, List<IText> titles) {
 		this(closeDialog, false, titles);
 	}
-	public OptionMultiTitle(boolean closeDialog, boolean canBackPreviouDialog, List<IText> titles) {
+	public OptionMultiTitle(boolean closeDialog, boolean canBackPreviousDialog, List<IText> titles) {
 		super(CONTINUE, closeDialog);
 		this.titles = titles;
-		this.canBackPreviouDialog = canBackPreviouDialog;
+		this.canBackPreviousDialog = canBackPreviousDialog;
 	}
 	
 	@ZenGetter("titles")
@@ -86,19 +86,19 @@ public class OptionMultiTitle extends OptionButton implements IDialogOption {
 	@SideOnly(Side.CLIENT)
 	public List<String> getTitlesAsString(){
 		List<String> titles = Lists.newArrayList();
-		for(int i = 0; i < this.titles.size(); i++) {
-			titles.add(this.titles.get(i).format());
+		for (IText title : this.titles) {
+			titles.add(title.format());
 		}
 		return titles;
 	}
 	
 	@ZenGetter("canBack")
-	public boolean canBackPreviouDialog() {
-		return canBackPreviouDialog;
+	public boolean canBackPreviousDialog() {
+		return canBackPreviousDialog;
 	}
 	@ZenMethod("canBack")
-	public OptionMultiTitle setCanBackPreviouDialog(boolean canBackPreviouDialog) {
-		this.canBackPreviouDialog = canBackPreviouDialog;
+	public OptionMultiTitle setCanBackPreviousDialog(boolean canBackPreviousDialog) {
+		this.canBackPreviousDialog = canBackPreviousDialog;
 		return this;
 	}
 	
@@ -116,7 +116,7 @@ public class OptionMultiTitle extends OptionButton implements IDialogOption {
 		for(int i = 0; i < tileJson.size(); i++) {
 			this.addTitles(new Text(tileJson.get(i).getAsJsonObject()));
 		}
-		this.setCanBackPreviouDialog(json.has("canBackParentDialog") && json.get("canBackParentDialog").getAsBoolean());
+		this.setCanBackPreviousDialog(json.has("canBackParentDialog") && json.get("canBackParentDialog").getAsBoolean());
 	}
 	
 	@Override
@@ -128,7 +128,7 @@ public class OptionMultiTitle extends OptionButton implements IDialogOption {
 			tileJson.add(this.getTitles().get(i).writeTo(JsonObject.class));
 		}
 		json.add("tiles", tileJson);
-		json.addProperty("canBackParentDialog", this.canBackPreviouDialog());
+		json.addProperty("canBackParentDialog", this.canBackPreviousDialog());
 		
 		return json;
 	}
@@ -141,7 +141,7 @@ public class OptionMultiTitle extends OptionButton implements IDialogOption {
 		for(int i = 0; i < tileNBT.tagCount(); i++) {
 			this.addTitles(new Text(tileNBT.getCompoundTagAt(i)));
 		}
-		this.setCanBackPreviouDialog(nbt.hasKey("canBackParentDialog") && nbt.getBoolean("canBackParentDialog"));
+		this.setCanBackPreviousDialog(nbt.hasKey("canBackParentDialog") && nbt.getBoolean("canBackParentDialog"));
 	}
 	@Override
 	public NBTTagCompound writeToNBT() {
@@ -152,7 +152,7 @@ public class OptionMultiTitle extends OptionButton implements IDialogOption {
 			tileNBT.append(this.getTitles().get(i).writeTo(NBTTagCompound.class));
 		}
 		nbt.setTag("tiles", tileNBT);
-		nbt.setBoolean("canBackParentDialog", this.canBackPreviouDialog());
+		nbt.setBoolean("canBackParentDialog", this.canBackPreviousDialog());
 		
 		return nbt;
 	}
@@ -170,7 +170,7 @@ public class OptionMultiTitle extends OptionButton implements IDialogOption {
 	
 	@Override
 	public OptionMultiTitle copy() {
-		List<IText> titles = this.getTitles() == null ? Collections.emptyList() : this.getTitles().stream().map(title -> title.copy()).collect(Collectors.toList());
-		return new OptionMultiTitle(canCloseDialog(), canBackPreviouDialog(), titles);
+		List<IText> titles = this.getTitles() == null ? Collections.emptyList() : this.getTitles().stream().map(IText::copy).collect(Collectors.toList());
+		return new OptionMultiTitle(canCloseDialog(), canBackPreviousDialog(), titles);
 	}
 }

@@ -35,7 +35,7 @@ public class OptionMultiTitleDrawUnit extends GuiOptionButton {
 	public void mouseClicked(GuiDialog gui, int mouseX, int mouseY, int mouseButton, OptionDimension dimension) {
 		if(GuiDialog.isInRange(mouseX, mouseY, dimension)) {
 			if(this.currentTitleIndex >= this.option.getTitles().size()-1) {
-				if(this.option.canBackPreviouDialog()
+				if(this.option.canBackPreviousDialog()
 				&& gui.getParentDialog() != null
 				&& !this.option.canCloseDialog()) {
 					MinecraftForge.EVENT_BUS.post(new MultiTitleEvent.BackParent(this.player, this.dialogID, this.optionID, this.option.getTitlesAsString(), this.currentTitleIndex, gui.getParentDialog().getDialog().getID()));
@@ -55,7 +55,7 @@ public class OptionMultiTitleDrawUnit extends GuiOptionButton {
 			
 			this.currentTitleIndex++;
 			if(this.currentTitleIndex == this.option.getTitles().size() - 1) {
-				if(this.option.canBackPreviouDialog()) {
+				if(this.option.canBackPreviousDialog()) {
 					this.option.setDisplayText(OptionMultiTitle.BACK);
 					super.text.clear();
 					super.text.addAll(super.getOptionText(option, dialogDimension, Minecraft.getMinecraft().fontRenderer));

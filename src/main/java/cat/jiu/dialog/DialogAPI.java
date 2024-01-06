@@ -2,6 +2,7 @@ package cat.jiu.dialog;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.BiFunction;
 
 import com.google.common.collect.Maps;
 import com.google.gson.JsonObject;
@@ -114,21 +115,27 @@ public class DialogAPI {
 		return null;
 	}
 	
-	static final Map<Class<? extends IOptionTask>, IOptionTaskSerializable> SerializableRegistry = Maps.newHashMap();
-	
-	public static void registerTask(Class<? extends IOptionTask> clazz, IOptionTaskSerializable serializable) {
+	static final Map<Class<? extends IOptionTask>, BiFunction<DialogList, JsonObject, IOptionTask>> SerializableRegistry = Maps.newHashMap();
+
+	@Deprecated
+	public static void registerTask_old(Class<? extends IOptionTask> clazz, IOptionTaskSerializable serializable) {
+		SerializableRegistry.put(clazz, serializable::read);
+	}
+	public static void registerTask(Class<? extends IOptionTask> clazz, BiFunction<DialogList, JsonObject, IOptionTask> serializable) {
 		SerializableRegistry.put(clazz, serializable);
 	}
 	
 	public static IOptionTask getTask(Class<? extends IOptionTask> clazz, DialogList list, JsonObject data) {
 		if(SerializableRegistry.containsKey(clazz)) {
-			return SerializableRegistry.get(clazz).read(list, data);
+			return SerializableRegistry.get(clazz).apply(list, data);
 		}
 		return null;
 	}
-	
+
+	@Deprecated
 	@FunctionalInterface
 	public static interface IOptionTaskSerializable {
+		@Deprecated
 		IOptionTask read(DialogList list, JsonObject data);
 	}
 }

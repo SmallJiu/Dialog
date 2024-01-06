@@ -22,6 +22,7 @@ import stanhebben.zenscript.annotations.ZenMethod;
 @ZenClass("dialog.Options")
 @SuppressWarnings("unchecked")
 public class DialogOption <T extends IDialogOption> implements IDialogOptionType {
+	private static boolean register;
 	private static final Map<ResourceLocation, DialogOption<?>> REGISTRY_ID = Maps.newHashMap();
 	private static final Map<Class<? extends IDialogOption>, DialogOption<?>> REGISTRY_CLAZZ = Maps.newHashMap();
 	
@@ -118,10 +119,13 @@ public class DialogOption <T extends IDialogOption> implements IDialogOptionType
 		if(REGISTRY_CLAZZ.containsKey(clazz)) {
 			return (DialogOption<T>) REGISTRY_CLAZZ.get(clazz);
 		}
-		return new DialogOption<T>(id, clazz);
+		return new DialogOption<>(id, clazz);
 	}
 	
 	public static void register() {
+		if (register) {
+			return;
+		}
 		BUTTON = register(ModMain.MODID, "button", OptionButton.class);
 		TEXT = register(ModMain.MODID, "text", OptionTextField.class);
 		
@@ -135,5 +139,6 @@ public class DialogOption <T extends IDialogOption> implements IDialogOptionType
 		RADIO_BUTTON_TIMER = register(ModMain.MODID, "timer_radio_btn", OptionTimerRadioButton.class);
 		ITEM_RADIO_BUTTON_TIMER = register(ModMain.MODID, "timer_item_radio", OptionTimerItemRadioButton.class);
 		ITEM_CHECKBOX_TIMER = register(ModMain.MODID, "timer_item_checkbox", OptionTimerItemCheckbox.class);
+		register = true;
 	}
 }
